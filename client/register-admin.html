@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register as Admin - BloodConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%); }
+        .input-focus:focus { box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3); }
+        .page-transition { animation: pageFadeIn 0.4s ease-out; }
+        @keyframes pageFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-6 page-transition">
+    <div class="w-full max-w-2xl">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <a href="home.html" class="inline-flex items-center gap-3 group">
+                <div class="w-14 h-14 flex items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 shadow-lg group-hover:scale-105 transition-all">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <div class="text-left">
+                    <h1 class="text-2xl font-bold text-white">BloodConnect</h1>
+                    <p class="text-sm text-purple-300">Admin Registration</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card -->
+        <div class="bg-white shadow-2xl rounded-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-purple-700 to-indigo-700 p-6 text-white">
+                <h2 class="text-2xl font-bold mb-1"><i class="fas fa-shield-alt mr-2"></i>Admin Account Registration</h2>
+                <p class="text-purple-200 text-sm">Create a system administrator account to manage the BloodConnect portal.</p>
+            </div>
+
+            <form id="adminRegForm" class="p-8 space-y-6">
+
+                <!-- Personal Info -->
+                <div>
+                    <h3 class="text-base font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                        <i class="fas fa-user-tie text-purple-600"></i> Personal Information
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                            <div class="relative">
+                                <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" name="fullName" required placeholder="Your full name"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Employee ID *</label>
+                            <div class="relative">
+                                <i class="fas fa-id-card absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" name="employeeId" required placeholder="e.g. EMP-001"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                            <div class="relative">
+                                <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="email" name="email" required placeholder="Official email address"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                            <div class="relative">
+                                <i class="fas fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="tel" name="phone" required placeholder="Contact number"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Designation *</label>
+                            <div class="relative">
+                                <i class="fas fa-briefcase absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <select name="designation" required class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition">
+                                    <option value="">Select Designation</option>
+                                    <option value="System Administrator">System Administrator</option>
+                                    <option value="Blood Bank Manager">Blood Bank Manager</option>
+                                    <option value="Regional Coordinator">Regional Coordinator</option>
+                                    <option value="Tech Administrator">Tech Administrator</option>
+                                    <option value="Super Admin">Super Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Department *</label>
+                            <div class="relative">
+                                <i class="fas fa-building absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" name="department" required placeholder="e.g. IT, Operations"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Permissions -->
+                <div>
+                    <h3 class="text-base font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                        <i class="fas fa-key text-purple-600"></i> Access Permissions Requested
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-purple-50 cursor-pointer">
+                            <input type="checkbox" name="permissions" value="manage_donors" class="w-4 h-4 text-purple-600 rounded">
+                            <span class="text-sm text-gray-700">Manage Donors</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-purple-50 cursor-pointer">
+                            <input type="checkbox" name="permissions" value="manage_requests" class="w-4 h-4 text-purple-600 rounded">
+                            <span class="text-sm text-gray-700">Manage Requests</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-purple-50 cursor-pointer">
+                            <input type="checkbox" name="permissions" value="manage_hospitals" class="w-4 h-4 text-purple-600 rounded">
+                            <span class="text-sm text-gray-700">Manage Hospitals</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-purple-50 cursor-pointer">
+                            <input type="checkbox" name="permissions" value="view_reports" class="w-4 h-4 text-purple-600 rounded">
+                            <span class="text-sm text-gray-700">View Reports</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-purple-50 cursor-pointer">
+                            <input type="checkbox" name="permissions" value="inventory_control" class="w-4 h-4 text-purple-600 rounded">
+                            <span class="text-sm text-gray-700">Inventory Control</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-purple-50 cursor-pointer">
+                            <input type="checkbox" name="permissions" value="full_access" class="w-4 h-4 text-purple-600 rounded">
+                            <span class="text-sm text-gray-700">Full Access</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Secret Key + Password -->
+                <div>
+                    <h3 class="text-base font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                        <i class="fas fa-lock text-purple-600"></i> Security Setup
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Admin Secret Key *</label>
+                            <div class="relative">
+                                <i class="fas fa-key absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="password" name="secretKey" required placeholder="Enter admin secret key"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Contact the super admin to get this key.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                            <div class="relative">
+                                <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="password" name="password" required minlength="8" placeholder="Create a strong password"
+                                    class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition">
+                                <button type="button" onclick="togglePwd(this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password *</label>
+                            <div class="relative">
+                                <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="password" name="confirmPassword" required placeholder="Confirm your password"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terms -->
+                <div class="p-4 bg-purple-50 rounded-xl border border-purple-200">
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" name="terms" required class="w-4 h-4 text-purple-600 rounded mt-0.5">
+                        <span class="text-sm text-gray-700">I confirm that I am an authorized personnel and all information provided is accurate. I agree to the <a href="#" class="text-purple-600 hover:underline">Terms of Service</a> and <a href="#" class="text-purple-600 hover:underline">Privacy Policy</a>.</span>
+                    </label>
+                </div>
+
+                <!-- Error -->
+                <div id="errorMsg" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    <i class="fas fa-exclamation-triangle mr-2"></i><span id="errorTxt"></span>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" id="submitBtn" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-800 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                    <i class="fas fa-shield-alt"></i>
+                    <span id="btnTxt">Create Admin Account</span>
+                    <div id="btnSpinner" class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                </button>
+
+                <p class="text-center text-sm text-gray-500">Already have an account? <a href="login.html" class="text-purple-600 font-medium hover:underline">Login here</a></p>
+            </form>
+        </div>
+
+        <div class="text-center mt-6">
+            <a href="home.html" class="text-purple-300 hover:text-white text-sm flex items-center justify-center gap-2 transition-colors">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <span id="toastMsg"></span>
+    </div>
+
+    <script>
+        function togglePwd(btn) {
+            const input = btn.parentElement.querySelector('input');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            btn.querySelector('i').className = input.type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            t.classList.remove('translate-y-20','opacity-0');
+            setTimeout(() => t.classList.add('translate-y-20','opacity-0'), 3000);
+        }
+
+        document.getElementById('adminRegForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+
+            if (form.password.value !== form.confirmPassword.value) {
+                document.getElementById('errorTxt').textContent = 'Passwords do not match.';
+                document.getElementById('errorMsg').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('errorMsg').classList.add('hidden');
+            const btn = document.getElementById('submitBtn');
+            const originalText = document.getElementById('btnTxt').textContent;
+            document.getElementById('btnTxt').textContent = 'Creating account...';
+            document.getElementById('btnSpinner').classList.remove('hidden');
+            btn.disabled = true;
+
+            const payload = {
+                fullName: form.fullName.value,
+                employeeId: form.employeeId.value,
+                email: form.email.value,
+                phone: form.phone.value,
+                designation: form.designation.value,
+                department: form.department.value,
+                password: form.password.value,
+                secretKey: form.secretKey.value
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/register-admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showToast('Admin account request submitted! You can now log in.');
+                    setTimeout(() => window.location.href = 'login.html', 2500);
+                } else {
+                    document.getElementById('errorTxt').textContent = data.error || 'Registration failed.';
+                    document.getElementById('errorMsg').classList.remove('hidden');
+                    document.getElementById('btnTxt').textContent = originalText;
+                    document.getElementById('btnSpinner').classList.add('hidden');
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                document.getElementById('errorTxt').textContent = 'Network error. Could not connect to API.';
+                document.getElementById('errorMsg').classList.remove('hidden');
+                document.getElementById('btnTxt').textContent = originalText;
+                document.getElementById('btnSpinner').classList.add('hidden');
+                btn.disabled = false;
+            }
+        });
+    </script>
+    <script src="js/app.js"></script>
+</body>
+</html>

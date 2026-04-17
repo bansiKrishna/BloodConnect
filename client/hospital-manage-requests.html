@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Requests - Hospital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-white min-h-screen">
+    <header class="bg-white/95 backdrop-blur-md shadow-sm border-b border-blue-100 sticky top-0 z-40">
+        <div class="px-6 py-3 flex items-center justify-between">
+            <h1 class="text-xl font-bold text-blue-700">Hospital - Manage Requests</h1>
+            <a href="hospital-dashboard.html" class="text-blue-600 hover:underline">Back to Dashboard</a>
+        </div>
+    </header>
+    <main class="p-6 max-w-7xl mx-auto">
+        <div class="bg-white rounded-xl border border-blue-100 p-4 mb-4 flex gap-3">
+            <select id="statusFilter" class="border border-blue-200 rounded px-3 py-2">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="fulfilled">Fulfilled</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+            <button onclick="fetchRequests()" class="px-4 py-2 bg-blue-600 text-white rounded">Load Requests</button>
+        </div>
+        <div id="requestsList" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+    </main>
+    <script>
+        if (!localStorage.getItem('isLoggedIn') || localStorage.getItem('userRole') !== 'hospital') {
+            window.location.href = 'login.html';
+        }
+
+        async function fetchRequests() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const res = await fetch('http://localhost:3000/api/dashboard/requests?limit=100');
+            const data = await res.json();
+            const list = document.getElementById('requestsList');
+            let requests = data.requests || [];
+            if (statusFilter) {
+                requests = requests.filter(r => r.status === statusFilter);
+            }
+            if (!requests.length) {
+                list.innerHTML = '<div class="text-gray-500">No requests found.</div>';
+                return;
+            }
+            list.innerHTML = requests.map(r => `
+                <div class="bg-white border border-blue-100 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-semibold text-gray-800">REQ-${r.id} | ${r.blood_group}</h3>
+                        <span class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700">${r.status}</span>
+                    </div>
+                    <p class="text-sm text-gray-600">Requester: ${r.requester_name}</p>
+                    <p class="text-sm text-gray-600">Units: ${r.units} | Urgency: ${r.urgency}</p>
+                    <p class="text-xs text-gray-500 mb-3">${new Date(r.created_at).toLocaleString()}</p>
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="updateStatus(${r.id}, 'fulfilled')" class="px-3 py-2 bg-green-600 text-white rounded text-sm">Mark Fulfilled</button>
+                        <button onclick="updateStatus(${r.id}, 'cancelled')" class="px-3 py-2 bg-rose-600 text-white rounded text-sm">Cancel</button>
+                        <button onclick="updateStatus(${r.id}, 'pending')" class="px-3 py-2 bg-amber-600 text-white rounded text-sm">Keep Pending</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function updateStatus(id, status) {
+            const res = await fetch(`http://localhost:3000/api/dashboard/requests/${id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.message || 'Failed to update request');
+                return;
+            }
+            fetchRequests();
+        }
+
+        fetchRequests();
+    </script>
+</body>
+</html>

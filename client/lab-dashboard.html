@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Lab Dashboard - BloodConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .sidebar { transition: all 0.3s ease; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        
+        /* Page transition */
+        .page-transition {
+            animation: pageFadeIn 0.4s ease-out;
+        }
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Button ripple effect */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .btn-ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 to-white min-h-screen page-transition">
+    <!-- Header -->
+    <header class="bg-white/95 backdrop-blur-md shadow-sm border-b border-red-100 sticky top-0 z-40">
+        <div class="flex justify-between items-center px-4 sm:px-6 py-3">
+            <div class="flex items-center gap-3">
+                <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg hover:bg-red-100 text-red-600 transition-all">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-xl bg-red-100 shadow-sm">
+                        <i class="fas fa-clipboard-plus text-red-600 text-xl"></i>
+                    </div>
+                    <div class="hidden sm:block">
+                        <h1 class="text-lg sm:text-xl font-bold text-red-700">Blood Lab Center</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Testing & Quality Control</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white font-bold shadow-lg border-2 border-white">
+                        <span id="userInitial">L</span>
+                    </div>
+                    <div class="hidden sm:block text-right">
+                        <span id="userName" class="font-medium block text-sm text-red-700">Metro Blood Lab</span>
+                        <span class="text-xs text-gray-500">Blood Lab</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="p-2 rounded-lg hover:bg-red-100 text-red-600 transition-all" title="Logout">
+                    <i class="fas fa-sign-out-alt text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-xl border-r border-red-100 transform -translate-x-full lg:translate-x-0 flex flex-col">
+            <div class="flex items-center justify-between p-4 border-b border-red-100">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-red-100">
+                        <i class="fas fa-flask text-red-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-sm text-red-700">Lab</h2>
+                        <p class="text-xs text-gray-500">Portal</p>
+                    </div>
+                </div>
+                <button id="sidebarClose" class="lg:hidden p-1.5 rounded-lg hover:bg-red-100 text-red-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="flex-1 p-4 overflow-y-auto">
+                <div class="flex flex-col gap-1">
+                    <a href="lab-dashboard.html" class="flex items-center gap-3 w-full p-3 rounded-xl text-white shadow-md font-semibold transform scale-[1.02] bg-gradient-to-r from-red-500 to-red-600">
+                        <i class="fas fa-chart-bar w-5"></i>
+                        <span class="flex-1 text-left text-sm">Dashboard</span>
+                    </a>
+                    <a href="#" onclick="showToast('Inventory page coming soon!')" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-red-700 hover:bg-red-50 transition-all">
+                        <i class="fas fa-tint w-5"></i>
+                        <span class="flex-1 text-left text-sm">Inventory</span>
+                    </a>
+                    <a href="#" onclick="showToast('Donors page coming soon!')" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-red-700 hover:bg-red-50 transition-all">
+                        <i class="fas fa-user w-5"></i>
+                        <span class="flex-1 text-left text-sm">Donors</span>
+                    </a>
+                    <a href="#" onclick="showToast('Camps page coming soon!')" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-red-700 hover:bg-red-50 transition-all">
+                        <i class="fas fa-calendar w-5"></i>
+                        <span class="flex-1 text-left text-sm">Camps</span>
+                    </a>
+                    <a href="#" onclick="showToast('Requests page coming soon!')" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-red-700 hover:bg-red-50 transition-all">
+                        <i class="fas fa-clipboard-list w-5"></i>
+                        <span class="flex-1 text-left text-sm">Requests</span>
+                    </a>
+                    <a href="#" onclick="showToast('Profile page coming soon!')" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-red-700 hover:bg-red-50 transition-all">
+                        <i class="fas fa-check-circle w-5"></i>
+                        <span class="flex-1 text-left text-sm">Profile</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="p-4 border-t border-red-100">
+                <div class="p-3 rounded-lg bg-red-100 text-red-700 text-center">
+                    <p class="text-sm font-semibold">Blood Bank MS</p>
+                    <p class="text-xs mt-1 opacity-75">Save Lives, Donate Blood</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Overlay for mobile -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8">
+            <!-- Page Header -->
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                        <div class="p-2 bg-red-100 rounded-xl">
+                            <i class="fas fa-flask text-red-600"></i>
+                        </div>
+                        Blood Lab Dashboard
+                    </h1>
+                    <p class="text-gray-600 mt-2">Manage blood testing and inventory</p>
+                </div>
+                <button onclick="refreshData()" id="refreshBtn" class="mt-4 lg:mt-0 flex items-center gap-2 px-4 py-2 bg-white border border-red-200 rounded-lg text-red-600 hover:bg-red-50 transition-colors">
+                    <i id="refreshIcon" class="fas fa-sync-alt"></i>
+                    <span id="refreshText">Refresh Data</span>
+                </button>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="metricsGrid">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Blood Stock Section -->
+                <div class="bg-white rounded-2xl shadow-lg border border-red-50 p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-tint text-red-600"></i> Blood Stock
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Current inventory by type</p>
+                        </div>
+                        <button onclick="showToast('Viewing full inventory...')" class="text-red-600 text-sm hover:underline">View All</button>
+                    </div>
+                    <div id="bloodStock" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Pending Tests Section -->
+                <div class="bg-white rounded-2xl shadow-lg border border-red-50 p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-vial text-red-600"></i> Pending Tests
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Blood samples awaiting testing</p>
+                        </div>
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">12 Pending</span>
+                    </div>
+                    <div id="pendingTests" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Camps Section -->
+            <div class="bg-white rounded-2xl shadow-lg border border-red-50 p-6 mt-8 card-hover">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-calendar-alt text-red-600"></i> Upcoming Blood Camps
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-1">Scheduled donation drives</p>
+                    </div>
+                    <button onclick="showToast('Creating new camp...')" class="px-3 py-1 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">
+                        <i class="fas fa-plus mr-1"></i> New Camp
+                    </button>
+                </div>
+                <div id="upcomingCamps" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Recent Donations Section -->
+            <div class="bg-white rounded-2xl shadow-lg border border-red-50 p-6 mt-8 card-hover">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-heart text-red-600"></i> Recent Donations
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-1">Latest blood donations received</p>
+                    </div>
+                    <button onclick="showToast('Viewing all donations...')" class="text-red-600 text-sm hover:underline">View All</button>
+                </div>
+                <div id="recentDonations" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-2xl shadow-lg border border-red-50 p-6 mt-8 card-hover">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-bolt text-red-600"></i> Quick Actions
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-1">Common lab operations</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="quickActions">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        // Check if logged in as lab
+        if (!localStorage.getItem('isLoggedIn') || localStorage.getItem('userRole') !== 'lab') {
+            window.location.href = 'login.html';
+        }
+
+        // Mock lab data
+        const labData = {
+            name: 'Metro Blood Lab',
+            totalUnits: 1250,
+            testedToday: 45,
+            pendingTests: 12,
+            expiringSoon: 8
+        };
+
+        const bloodStock = [
+            { type: 'A+', units: 180, tested: 175, status: 'normal' },
+            { type: 'A-', units: 45, tested: 42, status: 'low' },
+            { type: 'B+', units: 165, tested: 160, status: 'normal' },
+            { type: 'B-', units: 35, tested: 33, status: 'critical' },
+            { type: 'O+', units: 220, tested: 215, status: 'normal' },
+            { type: 'O-', units: 55, tested: 52, status: 'low' },
+            { type: 'AB+', units: 75, tested: 73, status: 'normal' },
+            { type: 'AB-', units: 25, tested: 24, status: 'critical' }
+        ];
+
+        const pendingTests = [
+            { id: 'TST-001', donor: 'John Smith', bloodType: 'O+', collected: '2 hours ago', priority: 'normal' },
+            { id: 'TST-002', donor: 'Sarah Johnson', bloodType: 'A-', collected: '3 hours ago', priority: 'high' },
+            { id: 'TST-003', donor: 'Mike Davis', bloodType: 'B+', collected: '4 hours ago', priority: 'normal' },
+            { id: 'TST-004', donor: 'Emily Wilson', bloodType: 'O-', collected: '5 hours ago', priority: 'urgent' }
+        ];
+
+        const upcomingCamps = [
+            { name: 'Community Blood Drive', date: '2026-03-25', location: 'City Center Mall', expected: 50 },
+            { name: 'Corporate Donation Camp', date: '2026-03-28', location: 'Tech Park', expected: 100 },
+            { name: 'University Drive', date: '2026-04-02', location: 'State University', expected: 75 }
+        ];
+
+        const recentDonations = [
+            { donor: 'Robert Chen', bloodType: 'A+', units: 1, date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), status: 'tested' },
+            { donor: 'Lisa Anderson', bloodType: 'O-', units: 1, date: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), status: 'testing' },
+            { donor: 'David Martinez', bloodType: 'B+', units: 1, date: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), status: 'tested' },
+            { donor: 'Jennifer Lee', bloodType: 'AB+', units: 1, date: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(), status: 'tested' }
+        ];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('userName').textContent = labData.name;
+            document.getElementById('userInitial').textContent = labData.name.charAt(0);
+            
+            renderMetrics();
+            renderBloodStock();
+            renderPendingTests();
+            renderUpcomingCamps();
+            renderRecentDonations();
+            renderQuickActions();
+        });
+
+        function renderMetrics() {
+            const container = document.getElementById('metricsGrid');
+            const metrics = [
+                { icon: 'fa-tint', label: 'Total Units', value: labData.totalUnits, subtitle: 'In inventory', color: 'blue' },
+                { icon: 'fa-check-circle', label: 'Tested Today', value: labData.testedToday, subtitle: 'Samples processed', color: 'green' },
+                { icon: 'fa-vial', label: 'Pending Tests', value: labData.pendingTests, subtitle: 'Awaiting testing', color: 'yellow' },
+                { icon: 'fa-exclamation-circle', label: 'Expiring Soon', value: labData.expiringSoon, subtitle: 'Within 7 days', color: 'red' }
+            ];
+
+            container.innerHTML = metrics.map(m => `
+                <div class="bg-white rounded-xl shadow-lg border-l-4 border-${m.color}-400 p-5 card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600 mb-1">${m.label}</p>
+                            <p class="text-2xl font-bold text-gray-800">${m.value}</p>
+                            <p class="text-xs text-gray-500 mt-1">${m.subtitle}</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-${m.color}-100 text-${m.color}-600">
+                            <i class="fas ${m.icon} text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderBloodStock() {
+            const container = document.getElementById('bloodStock');
+            container.innerHTML = bloodStock.map(item => {
+                const statusColors = {
+                    normal: 'bg-green-500',
+                    low: 'bg-yellow-500',
+                    critical: 'bg-red-500'
+                };
+                const percentage = Math.min(100, (item.units / 250) * 100);
+                
+                return `
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold">
+                                    ${item.type}
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-800">${item.units} units</p>
+                                    <p class="text-xs text-gray-500">${item.tested} tested</p>
+                                </div>
+                            </div>
+                            <span class="text-sm font-medium ${item.status === 'critical' ? 'text-red-600' : item.status === 'low' ? 'text-yellow-600' : 'text-green-600'}">
+                                ${item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="${statusColors[item.status]} h-2 rounded-full transition-all" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPendingTests() {
+            const container = document.getElementById('pendingTests');
+            const priorityColors = {
+                normal: 'bg-gray-100 text-gray-700',
+                high: 'bg-orange-100 text-orange-700',
+                urgent: 'bg-red-100 text-red-700'
+            };
+
+            container.innerHTML = pendingTests.map(test => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <i class="fas fa-vial"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-800">${test.donor}</p>
+                            <p class="text-xs text-gray-500">${test.id} • Collected ${test.collected}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-xs">
+                            ${test.bloodType}
+                        </div>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${priorityColors[test.priority]}">
+                            ${test.priority.charAt(0).toUpperCase() + test.priority.slice(1)}
+                        </span>
+                        <button onclick="showToast('Starting test for ${test.donor}...')" class="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            <i class="fas fa-play text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderUpcomingCamps() {
+            const container = document.getElementById('upcomingCamps');
+            container.innerHTML = upcomingCamps.map(camp => `
+                <div class="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h4 class="font-semibold text-gray-800">${camp.name}</h4>
+                            <p class="text-sm text-gray-500 mt-1"><i class="fas fa-map-marker-alt mr-1"></i> ${camp.location}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-medium text-red-600">${new Date(camp.date).toLocaleDateString()}</p>
+                            <p class="text-xs text-gray-500">${camp.expected} expected</p>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex gap-2">
+                        <button onclick="showToast('Editing ${camp.name}...')" class="flex-1 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-edit mr-1"></i> Edit
+                        </button>
+                        <button onclick="showToast('Viewing details...')" class="flex-1 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">
+                            <i class="fas fa-eye mr-1"></i> View
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRecentDonations() {
+            const container = document.getElementById('recentDonations');
+            const statusColors = {
+                tested: 'bg-green-100 text-green-700',
+                testing: 'bg-yellow-100 text-yellow-700'
+            };
+
+            container.innerHTML = recentDonations.map(donation => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white font-bold">
+                            ${donation.donor.charAt(0)}
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-800">${donation.donor}</p>
+                            <p class="text-xs text-gray-500">${new Date(donation.date).toLocaleString()}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-xs">
+                            ${donation.bloodType}
+                        </div>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${statusColors[donation.status]}">
+                            ${donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderQuickActions() {
+            const container = document.getElementById('quickActions');
+            const actions = [
+                { icon: 'fa-vial', title: 'Process Sample', description: 'Test new blood sample', color: 'red' },
+                { icon: 'fa-plus-circle', title: 'Add Donation', description: 'Record new donation', color: 'blue' },
+                { icon: 'fa-calendar-plus', title: 'Schedule Camp', description: 'Create donation camp', color: 'green' },
+                { icon: 'fa-file-alt', title: 'Generate Report', description: 'Create lab report', color: 'purple' }
+            ];
+
+            const colorClasses = {
+                red: 'bg-red-50 text-red-600 hover:bg-red-100 border-red-200',
+                blue: 'bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200',
+                green: 'bg-green-50 text-green-600 hover:bg-green-100 border-green-200',
+                purple: 'bg-purple-50 text-purple-600 hover:bg-purple-100 border-purple-200'
+            };
+
+            container.innerHTML = actions.map(a => `
+                <button onclick="showToast('${a.title} clicked!')" class="p-4 rounded-xl border text-left transition-colors ${colorClasses[a.color]}">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 bg-white rounded-lg"><i class="fas ${a.icon}"></i></div>
+                        <h4 class="font-semibold">${a.title}</h4>
+                    </div>
+                    <p class="text-sm opacity-75">${a.description}</p>
+                </button>
+            `).join('');
+        }
+
+        function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            const icon = document.getElementById('refreshIcon');
+            const text = document.getElementById('refreshText');
+            
+            icon.classList.add('fa-spin');
+            text.textContent = 'Refreshing...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+                text.textContent = 'Refresh Data';
+                btn.disabled = false;
+                showToast('Dashboard updated successfully!');
+            }, 1500);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function logout() {
+            if (window.BloodConnect) {
+                window.BloodConnect.confirm('Are you sure you want to logout?', function() {
+                    localStorage.removeItem('isLoggedIn');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('userEmail');
+                    window.BloodConnect.showToast('Logged out successfully', 'success');
+                    setTimeout(() => {
+                        window.BloodConnect.navigateTo('login.html');
+                    }, 1000);
+                });
+            } else {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('userEmail');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Sidebar toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+        });
+
+        sidebarClose.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        });
+        
+        // Show welcome toast
+        if (window.BloodConnect) {
+            setTimeout(() => {
+                window.BloodConnect.showToast('Welcome back, ' + labData.name + '!', 'success');
+            }, 500);
+        }
+    </script>
+    <!-- Shared App JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>

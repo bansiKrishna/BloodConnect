@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facilities - BloodConnect Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .sidebar { transition: all 0.3s ease; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .page-transition { animation: pageFadeIn 0.4s ease-out; }
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-indigo-50 min-h-screen page-transition">
+    <header class="bg-white/95 backdrop-blur-md shadow-sm border-b border-purple-100 sticky top-0 z-40">
+        <div class="flex justify-between items-center px-4 sm:px-6 py-3">
+            <div class="flex items-center gap-3">
+                <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg hover:bg-purple-100 text-purple-600 transition-all">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-xl bg-purple-100 shadow-sm">
+                        <i class="fas fa-hospital text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="hidden sm:block">
+                        <h1 class="text-lg sm:text-xl font-bold text-purple-700">Admin Panel</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Facilities & Organizations</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold shadow-lg border-2 border-white">
+                        <span id="userInitial">A</span>
+                    </div>
+                    <div class="hidden sm:block text-right">
+                        <span id="userName" class="font-medium block text-sm text-purple-700">Admin User</span>
+                        <span class="text-xs text-gray-500">Administrator</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="p-2 rounded-lg hover:bg-purple-100 text-purple-600 transition-all" title="Logout">
+                    <i class="fas fa-sign-out-alt text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex h-[calc(100vh-68px)] overflow-hidden">
+        <aside id="sidebar" class="sidebar fixed lg:static top-[68px] bottom-0 lg:top-auto lg:bottom-auto left-0 z-50 w-64 bg-white shadow-xl border-r border-purple-100 transform -translate-x-full lg:translate-x-0 flex flex-col">
+            <div class="flex items-center justify-between p-4 border-b border-purple-100">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-purple-100">
+                        <i class="fas fa-shield-alt text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-sm text-purple-700">Admin</h2>
+                        <p class="text-xs text-gray-500">Panel</p>
+                    </div>
+                </div>
+                <button id="sidebarClose" class="lg:hidden p-1.5 rounded-lg hover:bg-purple-100 text-purple-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="flex-1 p-4 overflow-y-auto">
+                <div class="flex flex-col gap-1">
+                    <a href="admin-dashboard.html" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-purple-700 hover:bg-purple-50 transition-all">
+                        <i class="fas fa-chart-bar w-5"></i>
+                        <span class="flex-1 text-left text-sm">Overview</span>
+                    </a>
+                    <a href="admin-verification.html" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-purple-700 hover:bg-purple-50 transition-all">
+                        <i class="fas fa-shield-alt w-5"></i>
+                        <span class="flex-1 text-left text-sm">Verification</span>
+                    </a>
+                    <a href="admin-facilities.html" class="flex items-center gap-3 w-full p-3 rounded-xl text-white shadow-md font-semibold transform scale-[1.02] bg-gradient-to-r from-purple-600 to-indigo-700">
+                        <i class="fas fa-hospital w-5"></i>
+                        <span class="flex-1 text-left text-sm">Facilities</span>
+                    </a>
+                    <a href="#" onclick="showToast('Donors page coming soon!')" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-purple-700 hover:bg-purple-50 transition-all">
+                        <i class="fas fa-users w-5"></i>
+                        <span class="flex-1 text-left text-sm">Donors</span>
+                    </a>
+                    <button onclick="deleteMyAccount()" class="flex items-center gap-3 w-full p-3 rounded-xl text-left text-rose-700 hover:bg-rose-50 transition-all">
+                        <i class="fas fa-user-times w-5"></i>
+                        <span class="flex-1 text-left text-sm">Delete Account</span>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="p-4 border-t border-purple-100">
+                <div class="p-3 rounded-lg bg-purple-100 text-purple-700 text-center">
+                    <p class="text-sm font-semibold">Blood Bank MS</p>
+                    <p class="text-xs mt-1 opacity-75">Save Lives, Donate Blood</p>
+                </div>
+            </div>
+        </aside>
+
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+            <div class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-purple-100 rounded-xl">
+                        <i class="fas fa-building text-purple-600 text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">Facilities Directory</h1>
+                        <p class="text-gray-600">Hospitals, labs and organizations in Berhampur & nearby areas.</p>
+                    </div>
+                </div>
+                <button id="refreshBtn" class="flex items-center gap-2 px-4 py-2 bg-white border border-purple-200 rounded-lg text-purple-600 hover:bg-purple-50 transition-colors">
+                    <i id="refreshIcon" class="fas fa-sync-alt"></i>
+                    <span id="refreshText">Refresh Data</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+                <div class="xl:col-span-2 bg-white rounded-2xl shadow-lg border border-purple-100 p-6 card-hover">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-table text-purple-600"></i> Hospitals & Labs
+                    </h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-purple-50 text-purple-700">
+                                    <th class="text-left px-3 py-2 rounded-l-lg">ID</th>
+                                    <th class="text-left px-3 py-2">Name</th>
+                                    <th class="text-left px-3 py-2">Category</th>
+                                    <th class="text-left px-3 py-2">Type</th>
+                                    <th class="text-left px-3 py-2">Phone</th>
+                                    <th class="text-left px-3 py-2 rounded-r-lg">Availability</th>
+                                </tr>
+                            </thead>
+                            <tbody id="facilityTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 card-hover">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-plus-circle text-purple-600"></i> Add New Facility
+                    </h2>
+                    <form id="addFacilityForm" class="space-y-3">
+                        <input name="external_id" required placeholder="ID (e.g. H004/L004)" class="w-full border border-purple-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        <input name="name" required placeholder="Facility Name" class="w-full border border-purple-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        <select name="category" required class="w-full border border-purple-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                            <option value="">Select Category</option>
+                            <option value="hospital">Hospital</option>
+                            <option value="lab">Lab</option>
+                        </select>
+                        <input name="facility_type" required placeholder="Type (Government/Private Lab etc.)" class="w-full border border-purple-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        <input name="services" placeholder="Services (comma separated)" class="w-full border border-purple-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        <input name="address" required placeholder="Address" class="w-full border border-purple-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        <input name="phone" placeholder="Phone" class="w-full border border-purple-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        <input name="availability" placeholder="Availability" class="w-full border border-purple-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="latitude" type="number" step="any" placeholder="Latitude" class="w-full border border-purple-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                            <input name="longitude" type="number" step="any" placeholder="Longitude" class="w-full border border-purple-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                        </div>
+                        <button type="submit" class="w-full bg-purple-600 text-white rounded-lg py-2 font-medium hover:bg-purple-700 transition-colors">
+                            Save Facility
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 card-hover">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-hand-holding-heart text-purple-600"></i> Donation Organizations
+                </h2>
+                <div id="orgGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('isLoggedIn') || localStorage.getItem('userRole') !== 'admin') {
+            window.location.href = 'login.html';
+        }
+
+        const userName = localStorage.getItem('userName') || 'System Administrator';
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('userInitial').textContent = userName.charAt(0).toUpperCase();
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2500);
+        }
+
+        async function safeParseJson(res) {
+            const raw = await res.text();
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                throw new Error(`Server returned non-JSON response (${res.status}). Please restart backend server.`);
+            }
+        }
+
+        async function fetchFacilities() {
+            const res = await fetch('http://localhost:3000/api/dashboard/facility-directory');
+            const data = await safeParseJson(res);
+            if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load facilities');
+            const tbody = document.getElementById('facilityTableBody');
+            tbody.innerHTML = (data.facilities || []).map(f => `
+                <tr class="border-b border-purple-50 hover:bg-purple-50/50">
+                    <td class="px-3 py-2 font-semibold text-purple-700">${f.external_id}</td>
+                    <td class="px-3 py-2">${f.name}</td>
+                    <td class="px-3 py-2 capitalize">${f.category}</td>
+                    <td class="px-3 py-2">${f.facility_type}</td>
+                    <td class="px-3 py-2">${f.phone || 'NA'}</td>
+                    <td class="px-3 py-2">${f.availability || 'NA'}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function fetchOrganizations() {
+            const res = await fetch('http://localhost:3000/api/dashboard/organizations');
+            const data = await safeParseJson(res);
+            if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load organizations');
+            const orgGrid = document.getElementById('orgGrid');
+            orgGrid.innerHTML = (data.organizations || []).map(org => `
+                <div class="rounded-xl border border-purple-100 bg-gradient-to-br from-white to-purple-50 p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="font-semibold text-gray-800">${org.name}</p>
+                        <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">${org.external_id}</span>
+                    </div>
+                    <p class="text-sm text-purple-700 mb-1">${org.org_type}</p>
+                    <p class="text-sm text-gray-600 mb-2">${org.services || 'NA'}</p>
+                    <p class="text-xs text-gray-500">${org.address}</p>
+                    <p class="text-xs text-gray-600 mt-1"><i class="fas fa-phone mr-1"></i>${org.phone || 'NA'}</p>
+                </div>
+            `).join('');
+        }
+
+        async function fetchAll() {
+            try {
+                await Promise.all([fetchFacilities(), fetchOrganizations()]);
+            } catch (err) {
+                showToast(err.message);
+            }
+        }
+
+        document.getElementById('addFacilityForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const payload = {
+                external_id: form.external_id.value.trim(),
+                name: form.name.value.trim(),
+                category: form.category.value,
+                facility_type: form.facility_type.value.trim(),
+                services: form.services.value.trim(),
+                address: form.address.value.trim(),
+                phone: form.phone.value.trim() || 'NA',
+                availability: form.availability.value.trim(),
+                latitude: form.latitude.value ? parseFloat(form.latitude.value) : null,
+                longitude: form.longitude.value ? parseFloat(form.longitude.value) : null
+            };
+            try {
+                const res = await fetch('http://localhost:3000/api/dashboard/facility-directory', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await safeParseJson(res);
+                if (!res.ok || !data.success) throw new Error(data.message || 'Failed to save facility');
+                showToast('Facility added successfully');
+                form.reset();
+                fetchFacilities();
+            } catch (err) {
+                showToast(err.message);
+            }
+        });
+
+        async function refreshData() {
+            const icon = document.getElementById('refreshIcon');
+            const text = document.getElementById('refreshText');
+            icon.classList.add('fa-spin');
+            text.textContent = 'Refreshing...';
+            await fetchAll();
+            icon.classList.remove('fa-spin');
+            text.textContent = 'Refresh Data';
+            showToast('Facilities data updated');
+        }
+        document.getElementById('refreshBtn').addEventListener('click', refreshData);
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            window.location.href = 'login.html';
+        }
+
+        async function deleteMyAccount() {
+            if (!confirm('Delete admin account permanently? This cannot be undone.')) return;
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/delete-account', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        role: 'admin',
+                        userId: localStorage.getItem('userId'),
+                        email: localStorage.getItem('userEmail')
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to delete account');
+                localStorage.clear();
+                window.location.href = 'register-admin.html';
+            } catch (err) {
+                showToast(err.message);
+            }
+        }
+
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+        });
+        sidebarClose.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        });
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        });
+
+        fetchAll();
+    </script>
+    <script src="js/app.js"></script>
+</body>
+</html>

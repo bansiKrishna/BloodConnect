@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - BloodConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .input-focus:focus { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
+        
+        /* Page transition */
+        .page-transition {
+            animation: pageFadeIn 0.4s ease-out;
+        }
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Button ripple effect */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .btn-ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Nav link hover animation */
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #ef4444;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .nav-link:hover::after {
+            width: 80%;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 page-transition">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="home.html" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg group-hover:shadow-xl transition-all">
+                        <i class="fas fa-tint text-white text-lg"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <h1 class="text-lg font-bold text-gray-900 group-hover:text-red-600 transition-colors">BloodConnect</h1>
+                        <p class="text-xs text-gray-500 -mt-0.5 font-medium">Blood Management System</p>
+                    </div>
+                </a>
+
+                <nav class="hidden md:flex items-center gap-2">
+                    <a href="home.html" class="nav-link px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-all">Home</a>
+                    <a href="about.html" class="nav-link px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-all">About</a>
+                    <a href="contact.html" class="nav-link px-4 py-2 text-sm font-medium rounded-lg text-red-700 bg-red-50">Contact</a>
+                    <div class="w-px h-6 bg-gray-300 mx-2"></div>
+                    <a href="login.html" class="nav-link px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-all">Login</a>
+                    <a href="register-donor.html" class="btn-ripple px-4 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg hover:shadow-xl hover:from-red-700 hover:to-red-800 transition-all">Register as Donor</a>
+                </nav>
+
+                <button id="mobileMenuBtn" class="md:hidden p-2 rounded-xl hover:bg-gray-100 text-gray-600">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+
+            <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200 pt-4 pb-6 px-3 bg-white/95 rounded-b-2xl shadow-lg">
+                <div class="space-y-1 mb-4">
+                    <a href="home.html" class="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-red-600">Home</a>
+                    <a href="about.html" class="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-red-600">About</a>
+                    <a href="contact.html" class="block px-4 py-3 rounded-xl text-base font-medium bg-red-50 text-red-700 border-l-4 border-red-500">Contact</a>
+                </div>
+                <div class="space-y-2 border-t border-gray-200 pt-4">
+                    <a href="login.html" class="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-red-600 text-center">Login</a>
+                    <a href="register-donor.html" class="block px-4 py-3 rounded-xl text-base font-medium bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg text-center">Register as Donor</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-16 bg-gradient-to-r from-red-700 to-red-900 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
+            <p class="text-xl text-red-100 max-w-2xl mx-auto">We're here to help. Reach out to us for any questions, support, or partnership inquiries.</p>
+        </div>
+    </section>
+
+    <!-- Contact Info Cards -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto -mt-24 relative z-10">
+                <div class="bg-white rounded-2xl shadow-xl p-8 text-center card-hover border border-gray-100">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+                        <i class="fas fa-phone-alt text-2xl text-red-600"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Phone</h3>
+                    <p class="text-gray-600 mb-2">Emergency Hotline</p>
+                    <a href="tel:1-800-BLOOD-NOW" class="text-red-600 font-semibold hover:underline">1-800-BLOOD-NOW</a>
+                    <p class="text-gray-500 text-sm mt-2">Available 24/7</p>
+                </div>
+                <div class="bg-white rounded-2xl shadow-xl p-8 text-center card-hover border border-gray-100">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-envelope text-2xl text-blue-600"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Email</h3>
+                    <p class="text-gray-600 mb-2">General Inquiries</p>
+                    <a href="mailto:help@bloodconnect.org" class="text-blue-600 font-semibold hover:underline">help@bloodconnect.org</a>
+                    <p class="text-gray-500 text-sm mt-2">Response within 24h</p>
+                </div>
+                <div class="bg-white rounded-2xl shadow-xl p-8 text-center card-hover border border-gray-100">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                        <i class="fas fa-map-marker-alt text-2xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Location</h3>
+                    <p class="text-gray-600 mb-2">Headquarters</p>
+                    <p class="text-green-600 font-semibold">Nationwide Network</p>
+                    <p class="text-gray-500 text-sm mt-2">150+ Partner Locations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form & Map Section -->
+    <section class="py-16 bg-slate-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <!-- Contact Form -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Send us a Message</h2>
+                        <p class="text-gray-600 mb-6">Fill out the form below and we'll get back to you as soon as possible.</p>
+                        
+                        <form id="contactForm" class="space-y-5">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                                    <input type="text" name="firstName" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                                    <input type="text" name="lastName" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                                <div class="relative">
+                                    <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <input type="email" name="email" required
+                                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Subject *</label>
+                                <select name="subject" required class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                                    <option value="">Select a subject</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="donor">Donor Support</option>
+                                    <option value="hospital">Hospital Partnership</option>
+                                    <option value="technical">Technical Support</option>
+                                    <option value="feedback">Feedback</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Message *</label>
+                                <textarea name="message" required rows="5" placeholder="How can we help you?"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition resize-none"></textarea>
+                            </div>
+                            <button type="submit" id="submitBtn" class="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-semibold hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl flex items-center justify-center">
+                                <span id="btnText">Send Message</span>
+                                <i id="btnIcon" class="fas fa-paper-plane ml-2"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div class="space-y-8">
+                        <div class="bg-white rounded-2xl shadow-lg p-8">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h3>
+                            <div class="space-y-4">
+                                <div class="border-b border-gray-100 pb-4">
+                                    <h4 class="font-medium text-gray-800 mb-2">How do I become a blood donor?</h4>
+                                    <p class="text-gray-600 text-sm">Simply click on "Register as Donor" and complete the registration form. You must be at least 17 years old and meet our health requirements.</p>
+                                </div>
+                                <div class="border-b border-gray-100 pb-4">
+                                    <h4 class="font-medium text-gray-800 mb-2">How can my hospital partner with BloodConnect?</h4>
+                                    <p class="text-gray-600 text-sm">Hospitals and blood banks can register through our "Register as Facility" page. Our team will review your application within 48 hours.</p>
+                                </div>
+                                <div class="border-b border-gray-100 pb-4">
+                                    <h4 class="font-medium text-gray-800 mb-2">Is there a mobile app available?</h4>
+                                    <p class="text-gray-600 text-sm">Yes! Our mobile app is available on both iOS and Android. Search for "BloodConnect" in your app store.</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800 mb-2">How do I request emergency blood?</h4>
+                                    <p class="text-gray-600 text-sm">Registered hospitals can use our emergency request feature in the dashboard. For public inquiries, call our 24/7 hotline.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-red-600 to-red-700 rounded-2xl shadow-lg p-8 text-white">
+                            <h3 class="text-xl font-bold mb-4">Emergency Contact</h3>
+                            <p class="text-red-100 mb-4">For urgent blood requirements or emergencies, please contact us immediately:</p>
+                            <div class="space-y-3">
+                                <a href="tel:1-800-BLOOD-NOW" class="flex items-center gap-3 text-white hover:text-red-100 transition-colors">
+                                    <i class="fas fa-phone-alt text-xl"></i>
+                                    <span class="text-lg font-semibold">1-800-BLOOD-NOW</span>
+                                </a>
+                                <a href="mailto:emergency@bloodconnect.org" class="flex items-center gap-3 text-white hover:text-red-100 transition-colors">
+                                    <i class="fas fa-envelope text-xl"></i>
+                                    <span>emergency@bloodconnect.org</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Media Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Connect With Us</h2>
+            <p class="text-gray-600 mb-8">Follow us on social media for updates, stories, and blood donation awareness.</p>
+            <div class="flex justify-center gap-4">
+                <a href="#" class="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-white text-xl hover:bg-blue-700 transition-all hover:scale-110">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="w-14 h-14 rounded-full bg-sky-500 flex items-center justify-center text-white text-xl hover:bg-sky-600 transition-all hover:scale-110">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="w-14 h-14 rounded-full bg-pink-600 flex items-center justify-center text-white text-xl hover:bg-pink-700 transition-all hover:scale-110">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="w-14 h-14 rounded-full bg-blue-700 flex items-center justify-center text-white text-xl hover:bg-blue-800 transition-all hover:scale-110">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="#" class="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center text-white text-xl hover:bg-red-700 transition-all hover:scale-110">
+                    <i class="fab fa-youtube"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-b from-slate-900 to-gray-900 text-white">
+        <div class="container mx-auto px-4 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+                <div class="lg:col-span-1">
+                    <a href="home.html" class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg">
+                            <i class="fas fa-heart text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-white">BloodConnect</h2>
+                            <p class="text-red-200 text-sm">Life Saver Network</p>
+                        </div>
+                    </a>
+                    <p class="text-gray-300 mb-6 leading-relaxed">Connecting compassionate donors with those in need through advanced blood bank management technology.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-6 text-white">Quick Links</h3>
+                    <ul class="space-y-3">
+                        <li><a href="home.html" class="text-gray-300 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="about.html" class="text-gray-300 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="contact.html" class="text-gray-300 hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="login.html" class="text-gray-300 hover:text-white transition-colors">Login</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-6 text-white">For Donors</h3>
+                    <ul class="space-y-3">
+                        <li><a href="register-donor.html" class="text-gray-300 hover:text-white transition-colors">Become a Donor</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Eligibility Criteria</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Donation Process</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-6 text-white">Contact</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-gray-300"><i class="fas fa-phone text-red-400"></i><span>1-800-BLOOD-NOW</span></div>
+                        <div class="flex items-center gap-3 text-gray-300"><i class="fas fa-envelope text-red-400"></i><span>help@bloodconnect.org</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-800">
+            <div class="container mx-auto px-4 py-6">
+                <div class="text-center text-gray-400 text-sm">&copy; 2026 BloodConnect. All rights reserved.</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        document.getElementById('contactForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            
+            submitBtn.disabled = true;
+            btnText.textContent = 'Sending...';
+            btnIcon.className = 'fas fa-spinner fa-spin ml-2';
+            
+            setTimeout(() => {
+                if (window.BloodConnect) {
+                    window.BloodConnect.showToast('Message sent successfully! We\'ll get back to you soon.', 'success');
+                } else {
+                    showToast('Message sent successfully! We\'ll get back to you soon.');
+                }
+                document.getElementById('contactForm').reset();
+                submitBtn.disabled = false;
+                btnText.textContent = 'Send Message';
+                btnIcon.className = 'fas fa-paper-plane ml-2';
+            }, 1500);
+        });
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+    <!-- Shared App JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Blood - BloodConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 50%, #fecaca 100%); }
+        .input-focus:focus { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
+        
+        /* Page transition */
+        .page-transition {
+            animation: pageFadeIn 0.4s ease-out;
+        }
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Button ripple effect */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .btn-ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Blood type card selection */
+        .blood-type-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .blood-type-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2);
+        }
+        .blood-type-card.selected {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border-color: #ef4444;
+        }
+        .blood-type-card.selected .blood-icon {
+            color: white;
+        }
+        
+        /* Urgency level styles */
+        .urgency-low { border-color: #10b981; color: #10b981; }
+        .urgency-medium { border-color: #f59e0b; color: #f59e0b; }
+        .urgency-high { border-color: #ef4444; color: #ef4444; }
+        .urgency-critical { border-color: #7f1d1d; color: #7f1d1d; background: #fef2f2; }
+        
+        .urgency-low.selected { background: #10b981; color: white; }
+        .urgency-medium.selected { background: #f59e0b; color: white; }
+        .urgency-high.selected { background: #ef4444; color: white; }
+        .urgency-critical.selected { background: #7f1d1d; color: white; }
+        
+        /* Progress bar */
+        .progress-step {
+            transition: all 0.3s ease;
+        }
+        .progress-step.active {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        .progress-step.completed {
+            background: #10b981;
+            color: white;
+        }
+        
+        /* Form section animation */
+        .form-section {
+            animation: slideIn 0.4s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* Nav link hover animation */
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #ef4444;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .nav-link:hover::after {
+            width: 80%;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen page-transition">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="home.html" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                        <i class="fas fa-tint text-white text-lg"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <h1 class="text-lg font-bold text-gray-900 group-hover:text-red-600 transition-colors">BloodConnect</h1>
+                        <p class="text-xs text-gray-500 -mt-0.5 font-medium">Blood Management System</p>
+                    </div>
+                </a>
+
+                <nav class="hidden md:flex items-center gap-2">
+                    <a href="home.html" class="nav-link px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-all">Home</a>
+                    <a href="about.html" class="nav-link px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-all">About</a>
+                    <a href="contact.html" class="nav-link px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-all">Contact</a>
+                    <div class="w-px h-6 bg-gray-300 mx-2"></div>
+                    <a href="login.html" class="nav-link px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-all">Login</a>
+                    <a href="register-donor.html" class="btn-ripple px-4 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg hover:shadow-xl hover:from-red-700 hover:to-red-800 hover:scale-105 transition-all">Register as Donor</a>
+                </nav>
+
+                <button id="mobileMenuBtn" class="md:hidden p-2 rounded-xl hover:bg-gray-100 text-gray-600">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+
+            <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200 pt-4 pb-6 px-3 bg-white/95 rounded-b-2xl shadow-lg">
+                <div class="space-y-1 mb-4">
+                    <a href="home.html" class="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-red-600">Home</a>
+                    <a href="about.html" class="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-red-600">About</a>
+                    <a href="contact.html" class="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-red-600">Contact</a>
+                </div>
+                <div class="space-y-2 border-t border-gray-200 pt-4">
+                    <a href="login.html" class="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-red-600 text-center">Login</a>
+                    <a href="register-donor.html" class="block px-4 py-3 rounded-xl text-base font-medium bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg text-center">Register as Donor</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-28 pb-12 px-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Page Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-100 text-red-700 text-sm font-medium mb-4">
+                    <i class="fas fa-heartbeat"></i>
+                    Emergency Blood Request
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Request Blood</h1>
+                <p class="text-gray-600">Fill in the details below to request blood units. We'll connect you with available donors.</p>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="flex items-center justify-center mb-8">
+                <div class="flex items-center gap-2">
+                    <div id="step1Indicator" class="progress-step active w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">1</div>
+                    <div class="w-16 h-1 bg-gray-200 rounded-full">
+                        <div id="progressBar1" class="h-full bg-red-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <div id="step2Indicator" class="progress-step w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm">2</div>
+                    <div class="w-16 h-1 bg-gray-200 rounded-full">
+                        <div id="progressBar2" class="h-full bg-red-500 rounded-full transition-all duration-0" style="width: 0%"></div>
+                    </div>
+                    <div id="step3Indicator" class="progress-step w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm">3</div>
+                </div>
+            </div>
+
+            <!-- Request Form -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+                <form id="bloodRequestForm">
+                    <!-- Step 1: Blood Details -->
+                    <div id="step1" class="form-section">
+                        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                            <i class="fas fa-tint text-red-600"></i>
+                            Blood Details
+                        </h2>
+
+                        <!-- Blood Type Selection -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Select Blood Type *</label>
+                            <div class="grid grid-cols-4 md:grid-cols-8 gap-3">
+                                <div class="blood-type-card border-2 border-gray-200 rounded-xl p-4 text-center" data-blood="A+">
+                                    <i class="fas fa-tint blood-icon text-red-500 text-xl mb-1"></i>
+                                    <p class="font-bold text-gray-800">A+</p>
+                                </div>
+                                <div class="blood-type-card border-2 border-gray-200 rounded-xl p-4 text-center" data-blood="A-">
+                                    <i class="fas fa-tint blood-icon text-red-500 text-xl mb-1"></i>
+                                    <p class="font-bold text-gray-800">A-</p>
+                                </div>
+                                <div class="blood-type-card border-2 border-gray-200 rounded-xl p-4 text-center" data-blood="B+">
+                                    <i class="fas fa-tint blood-icon text-red-500 text-xl mb-1"></i>
+                                    <p class="font-bold text-gray-800">B+</p>
+                                </div>
+                                <div class="blood-type-card border-2 border-gray-200 rounded-xl p-4 text-center" data-blood="B-">
+                                    <i class="fas fa-tint blood-icon text-red-500 text-xl mb-1"></i>
+                                    <p class="font-bold text-gray-800">B-</p>
+                                </div>
+                                <div class="blood-type-card border-2 border-gray-200 rounded-xl p-4 text-center" data-blood="O+">
+                                    <i class="fas fa-tint blood-icon text-red-500 text-xl mb-1"></i>
+                                    <p class="font-bold text-gray-800">O+</p>
+                                </div>
+                                <div class="blood-type-card border-2 border-gray-200 rounded-xl p-4 text-center" data-blood="O-">
+                                    <i class="fas fa-tint blood-icon text-red-500 text-xl mb-1"></i>
+                                    <p class="font-bold text-gray-800">O-</p>
+                                </div>
+                                <div class="blood-type-card border-2 border-gray-200 rounded-xl p-4 text-center" data-blood="AB+">
+                                    <i class="fas fa-tint blood-icon text-red-500 text-xl mb-1"></i>
+                                    <p class="font-bold text-gray-800">AB+</p>
+                                </div>
+                                <div class="blood-type-card border-2 border-gray-200 rounded-xl p-4 text-center" data-blood="AB-">
+                                    <i class="fas fa-tint blood-icon text-red-500 text-xl mb-1"></i>
+                                    <p class="font-bold text-gray-800">AB-</p>
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedBloodType" name="bloodType" required>
+                        </div>
+
+                        <!-- Units Required -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Units Required *</label>
+                            <div class="flex items-center gap-4">
+                                <button type="button" onclick="adjustUnits(-1)" class="w-12 h-12 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" id="units" name="units" value="1" min="1" max="20" readonly
+                                    class="w-24 text-center text-2xl font-bold text-gray-800 border-2 border-gray-200 rounded-xl py-2">
+                                <button type="button" onclick="adjustUnits(1)" class="w-12 h-12 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <span class="text-gray-500 text-sm">units (1 unit = 450ml)</span>
+                            </div>
+                        </div>
+
+                        <!-- Urgency Level -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Urgency Level *</label>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div class="urgency-option urgency-low border-2 rounded-xl p-4 text-center cursor-pointer transition-all" data-urgency="low">
+                                    <i class="fas fa-clock text-2xl mb-2"></i>
+                                    <p class="font-semibold">Low</p>
+                                    <p class="text-xs opacity-75">Within 24 hours</p>
+                                </div>
+                                <div class="urgency-option urgency-medium border-2 rounded-xl p-4 text-center cursor-pointer transition-all" data-urgency="medium">
+                                    <i class="fas fa-exclamation text-2xl mb-2"></i>
+                                    <p class="font-semibold">Medium</p>
+                                    <p class="text-xs opacity-75">Within 12 hours</p>
+                                </div>
+                                <div class="urgency-option urgency-high border-2 rounded-xl p-4 text-center cursor-pointer transition-all" data-urgency="high">
+                                    <i class="fas fa-heartbeat text-2xl mb-2"></i>
+                                    <p class="font-semibold">High</p>
+                                    <p class="text-xs opacity-75">Within 6 hours</p>
+                                </div>
+                                <div class="urgency-option urgency-critical border-2 rounded-xl p-4 text-center cursor-pointer transition-all" data-urgency="critical">
+                                    <i class="fas fa-ambulance text-2xl mb-2"></i>
+                                    <p class="font-semibold">Critical</p>
+                                    <p class="text-xs opacity-75">Immediate</p>
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedUrgency" name="urgency" required>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Patient Details -->
+                    <div id="step2" class="form-section hidden">
+                        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                            <i class="fas fa-user-injured text-red-600"></i>
+                            Patient Details
+                        </h2>
+
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Patient Name *</label>
+                                <input type="text" name="patientName" required placeholder="Full name of patient"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Age *</label>
+                                <input type="number" name="patientAge" required min="0" max="120" placeholder="Patient age"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
+                                <select name="patientGender" required class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number *</label>
+                                <input type="tel" name="contactNumber" required placeholder="Phone number"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Hospital/Facility Name *</label>
+                            <input type="text" name="hospitalName" required placeholder="Name of hospital or medical facility"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+                            <textarea name="address" required rows="3" placeholder="Complete address where blood is needed"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition resize-none"></textarea>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                                <input type="text" name="city" required placeholder="City"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">State *</label>
+                                <input type="text" name="state" required placeholder="State"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ZIP Code *</label>
+                                <input type="text" name="zipCode" required placeholder="ZIP"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Additional Info -->
+                    <div id="step3" class="form-section hidden">
+                        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                            <i class="fas fa-file-medical text-red-600"></i>
+                            Additional Information
+                        </h2>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Reason for Blood Request *</label>
+                            <select name="reason" required class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                                <option value="">Select Reason</option>
+                                <option value="surgery">Surgery</option>
+                                <option value="accident">Accident/Emergency</option>
+                                <option value="cancer">Cancer Treatment</option>
+                                <option value="delivery">Childbirth</option>
+                                <option value="anemia">Severe Anemia</option>
+                                <option value="thalassemia">Thalassemia</option>
+                                <option value="other">Other Medical Condition</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Required Date *</label>
+                            <input type="date" name="requiredDate" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Required Time</label>
+                            <input type="time" name="requiredTime"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
+                            <textarea name="notes" rows="4" placeholder="Any additional information that might help us process your request faster..."
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition resize-none"></textarea>
+                        </div>
+
+                        <div class="p-4 bg-red-50 rounded-xl border border-red-100">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox" name="terms" required class="w-5 h-5 text-red-600 rounded focus:ring-red-500 mt-0.5">
+                                <span class="text-sm text-gray-700">I confirm that all the information provided is accurate and this is a genuine blood request. I understand that providing false information is a serious offense. *</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="flex justify-between mt-8 pt-6 border-t border-gray-100">
+                        <button type="button" id="prevBtn" onclick="changeStep(-1)" class="hidden px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i> Previous
+                        </button>
+                        <button type="button" id="nextBtn" onclick="changeStep(1)" class="btn-ripple ml-auto px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-medium hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                        <button type="submit" id="submitBtn" class="btn-ripple hidden ml-auto px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-medium hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl">
+                            <i class="fas fa-paper-plane mr-2"></i> Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="grid md:grid-cols-3 gap-4 mt-8">
+                <div class="bg-white rounded-xl p-6 shadow-lg text-center">
+                    <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-phone text-blue-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-1">Emergency?</h3>
+                    <p class="text-sm text-gray-600">Call us at <a href="tel:1-800-BLOOD-NOW" class="text-red-600 font-medium">1-800-BLOOD-NOW</a></p>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-lg text-center">
+                    <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-green-100 flex items-center justify-center">
+                        <i class="fas fa-clock text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-1">Response Time</h3>
+                    <p class="text-sm text-gray-600">Average response in 30 minutes</p>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-lg text-center">
+                    <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-100 flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-purple-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-1">Safe & Secure</h3>
+                    <p class="text-sm text-gray-600">All donations are tested</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center transform scale-95 opacity-0 transition-all duration-300" id="successModalContent">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                <i class="fas fa-check-circle text-4xl text-green-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Request Submitted!</h2>
+            <p class="text-gray-600 mb-6">Your blood request has been submitted successfully. We'll notify you once we find matching donors.</p>
+            <div class="bg-gray-50 rounded-xl p-4 mb-6 text-left">
+                <p class="text-sm text-gray-600 mb-1">Request ID: <span id="requestId" class="font-mono font-bold text-gray-800"></span></p>
+                <p class="text-sm text-gray-600">Status: <span class="text-yellow-600 font-medium">Pending</span></p>
+            </div>
+            <div class="space-y-3">
+                <button type="button" onclick="trackRequest()" class="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-medium hover:from-red-700 hover:to-red-800 transition-all shadow-lg flex items-center justify-center gap-2">
+                    <i class="fas fa-map-marker-alt"></i> Track Request Live
+                </button>
+                <button type="button" onclick="closeSuccessModal()" class="w-full py-3 bg-white border border-red-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all">
+                    Return to Home
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Form state
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        // Blood type selection
+        document.querySelectorAll('.blood-type-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.blood-type-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('selectedBloodType').value = this.dataset.blood;
+            });
+        });
+
+        // Urgency level selection
+        document.querySelectorAll('.urgency-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.urgency-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('selectedUrgency').value = this.dataset.urgency;
+            });
+        });
+
+        // Adjust units
+        function adjustUnits(delta) {
+            const input = document.getElementById('units');
+            let value = parseInt(input.value) + delta;
+            if (value < 1) value = 1;
+            if (value > 20) value = 20;
+            input.value = value;
+        }
+
+        // Change step
+        function changeStep(direction) {
+            if (direction === 1 && !validateStep(currentStep)) {
+                return;
+            }
+
+            // Hide current step
+            document.getElementById(`step${currentStep}`).classList.add('hidden');
+            
+            // Update step
+            currentStep += direction;
+            
+            // Show new step
+            document.getElementById(`step${currentStep}`).classList.remove('hidden');
+            
+            // Update UI
+            updateProgress();
+            updateButtons();
+        }
+
+        // Validate current step
+        function validateStep(step) {
+            const stepElement = document.getElementById(`step${step}`);
+            const requiredFields = stepElement.querySelectorAll('[required]');
+            let isValid = true;
+
+            // Special validation for step 1
+            if (step === 1) {
+                if (!document.getElementById('selectedBloodType').value) {
+                    showToast('Please select a blood type', 'error');
+                    return false;
+                }
+                if (!document.getElementById('selectedUrgency').value) {
+                    showToast('Please select urgency level', 'error');
+                    return false;
+                }
+            }
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('border-red-500');
+                } else {
+                    field.classList.remove('border-red-500');
+                }
+            });
+
+            if (!isValid) {
+                showToast('Please fill in all required fields', 'error');
+            }
+
+            return isValid;
+        }
+
+        // Update progress indicators
+        function updateProgress() {
+            for (let i = 1; i <= totalSteps; i++) {
+                const indicator = document.getElementById(`step${i}Indicator`);
+                const progressBar = document.getElementById(`progressBar${i-1}`);
+                
+                if (i < currentStep) {
+                    indicator.classList.add('completed');
+                    indicator.classList.remove('active');
+                    indicator.innerHTML = '<i class="fas fa-check"></i>';
+                    if (progressBar) progressBar.style.width = '100%';
+                } else if (i === currentStep) {
+                    indicator.classList.add('active');
+                    indicator.classList.remove('completed');
+                    indicator.innerHTML = i;
+                } else {
+                    indicator.classList.remove('active', 'completed');
+                    indicator.innerHTML = i;
+                }
+            }
+        }
+
+        // Update navigation buttons
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            prevBtn.classList.toggle('hidden', currentStep === 1);
+            
+            if (currentStep === totalSteps) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+
+        // Form submission
+        document.getElementById('bloodRequestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...';
+
+        // Real API call
+        const blood_group = document.getElementById('selectedBloodType').value;
+        const units = document.getElementById('units').value;
+        const urgency = document.getElementById('selectedUrgency').value;
+        const requester_id = localStorage.getItem('userId') || null;
+        const requester_type = localStorage.getItem('userRole') === 'hospital' ? 'facility' : 'donor';
+
+        fetch('http://localhost:3000/api/dashboard/requests', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ blood_group, units, urgency, requester_id, requester_type })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('requestId').textContent = data.requestId;
+                
+                // Show success modal
+                const modal = document.getElementById('successModal');
+                const content = document.getElementById('successModalContent');
+                modal.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    content.classList.remove('scale-95', 'opacity-0');
+                }, 10);
+            } else {
+                showToast(data.message || 'Failed to submit request', 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Error submitting request:', err);
+            showToast('Network error, please try again', 'error');
+        })
+        .finally(() => {
+            // Reset button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Submit Request';
+        });
+    });
+
+        // Track request
+        function trackRequest() {
+            const requestId = document.getElementById('requestId').textContent;
+            const bg = document.getElementById('selectedBloodType').value || 'O+';
+            window.location.href = `track-request.html?id=${requestId}&bg=${encodeURIComponent(bg)}`;
+        }
+
+        // Close success modal
+        function closeSuccessModal() {
+            const modal = document.getElementById('successModal');
+            const content = document.getElementById('successModalContent');
+            
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                // Reset form and go to home
+                document.getElementById('bloodRequestForm').reset();
+                window.location.href = 'home.html';
+            }, 300);
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            const colors = {
+                success: 'bg-green-600',
+                error: 'bg-red-600',
+                warning: 'bg-yellow-600',
+                info: 'bg-gray-800'
+            };
+            
+            toast.className = `fixed bottom-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-0 opacity-100 transition-all duration-300 z-50`;
+            toastMessage.textContent = message;
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-20', 'opacity-0');
+                }, 300);
+            }, 3000);
+        }
+
+        // Set minimum date to today
+        document.querySelector('input[name="requiredDate"]').min = new Date().toISOString().split('T')[0];
+    </script>
+    <!-- Shared App JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>

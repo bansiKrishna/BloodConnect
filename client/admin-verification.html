@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification - BloodConnect Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .sidebar { transition: all 0.3s ease; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .page-transition { animation: pageFadeIn 0.4s ease-out; }
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-indigo-50 min-h-screen page-transition">
+    <header class="bg-white/95 backdrop-blur-md shadow-sm border-b border-purple-100 sticky top-0 z-40">
+        <div class="flex justify-between items-center px-4 sm:px-6 py-3">
+            <div class="flex items-center gap-3">
+                <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg hover:bg-purple-100 text-purple-600 transition-all">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-xl bg-purple-100 shadow-sm">
+                        <i class="fas fa-shield-alt text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="hidden sm:block">
+                        <h1 class="text-lg sm:text-xl font-bold text-purple-700">Admin Panel</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Verification Management</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold shadow-lg border-2 border-white">
+                        <span id="userInitial">A</span>
+                    </div>
+                    <div class="hidden sm:block text-right">
+                        <span id="userName" class="font-medium block text-sm text-purple-700">Admin User</span>
+                        <span class="text-xs text-gray-500">Administrator</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="p-2 rounded-lg hover:bg-purple-100 text-purple-600 transition-all" title="Logout">
+                    <i class="fas fa-sign-out-alt text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex h-[calc(100vh-68px)] overflow-hidden">
+        <aside id="sidebar" class="sidebar fixed lg:static top-[68px] bottom-0 lg:top-auto lg:bottom-auto left-0 z-50 w-64 bg-white shadow-xl border-r border-purple-100 transform -translate-x-full lg:translate-x-0 flex flex-col">
+            <div class="flex items-center justify-between p-4 border-b border-purple-100">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-purple-100">
+                        <i class="fas fa-shield-alt text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-sm text-purple-700">Admin</h2>
+                        <p class="text-xs text-gray-500">Panel</p>
+                    </div>
+                </div>
+                <button id="sidebarClose" class="lg:hidden p-1.5 rounded-lg hover:bg-purple-100 text-purple-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="flex-1 p-4 overflow-y-auto">
+                <div class="flex flex-col gap-1">
+                    <a href="admin-dashboard.html" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-purple-700 hover:bg-purple-50 transition-all">
+                        <i class="fas fa-chart-bar w-5"></i>
+                        <span class="flex-1 text-left text-sm">Overview</span>
+                    </a>
+                    <a href="admin-verification.html" class="flex items-center gap-3 w-full p-3 rounded-xl text-white shadow-md font-semibold transform scale-[1.02] bg-gradient-to-r from-purple-600 to-indigo-700">
+                        <i class="fas fa-shield-alt w-5"></i>
+                        <span class="flex-1 text-left text-sm">Verification</span>
+                    </a>
+                    <a href="admin-facilities.html" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-purple-700 hover:bg-purple-50 transition-all">
+                        <i class="fas fa-hospital w-5"></i>
+                        <span class="flex-1 text-left text-sm">Facilities</span>
+                    </a>
+                    <a href="#" onclick="showToast('Donors page coming soon!')" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-purple-700 hover:bg-purple-50 transition-all">
+                        <i class="fas fa-users w-5"></i>
+                        <span class="flex-1 text-left text-sm">Donors</span>
+                    </a>
+                    <button onclick="deleteMyAccount()" class="flex items-center gap-3 w-full p-3 rounded-xl text-left text-rose-700 hover:bg-rose-50 transition-all">
+                        <i class="fas fa-user-times w-5"></i>
+                        <span class="flex-1 text-left text-sm">Delete Account</span>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="p-4 border-t border-purple-100">
+                <div class="p-3 rounded-lg bg-purple-100 text-purple-700 text-center">
+                    <p class="text-sm font-semibold">Blood Bank MS</p>
+                    <p class="text-xs mt-1 opacity-75">Save Lives, Donate Blood</p>
+                </div>
+            </div>
+        </aside>
+
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+            <div class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-purple-100 rounded-xl">
+                        <i class="fas fa-id-card text-purple-600 text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">Donor Verification Queue</h1>
+                        <p class="text-gray-600">Review Aadhaar details, call donor, approve or reject.</p>
+                    </div>
+                </div>
+                <button id="refreshBtn" class="flex items-center gap-2 px-4 py-2 bg-white border border-purple-200 rounded-lg text-purple-600 hover:bg-purple-50 transition-colors">
+                    <i id="refreshIcon" class="fas fa-sync-alt"></i>
+                    <span id="refreshText">Refresh Queue</span>
+                </button>
+            </div>
+
+            <div class="bg-white rounded-xl border border-purple-100 px-4 py-3 mb-4 text-sm text-gray-600" id="summary">
+                Loading verification queue...
+            </div>
+            <div id="verificationList" class="grid grid-cols-1 xl:grid-cols-2 gap-5"></div>
+        </main>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('isLoggedIn') || localStorage.getItem('userRole') !== 'admin') {
+            window.location.href = 'login.html';
+        }
+
+        const userName = localStorage.getItem('userName') || 'System Administrator';
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('userInitial').textContent = userName.charAt(0).toUpperCase();
+
+        const verificationList = document.getElementById('verificationList');
+        const summary = document.getElementById('summary');
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2500);
+        }
+
+        function maskAadhaar(aadhaarNumber) {
+            if (!aadhaarNumber || aadhaarNumber.length < 4) return '************';
+            return `********${aadhaarNumber.slice(-4)}`;
+        }
+
+        async function fetchVerificationRequests() {
+            verificationList.innerHTML = '<div class="text-gray-500">Loading verification requests...</div>';
+            try {
+                const response = await fetch('http://localhost:3000/api/dashboard/verifications?status=pending');
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Failed to load verification queue');
+                }
+
+                const requests = data.requests || [];
+                summary.textContent = `${requests.length} pending verification request(s)`;
+
+                if (requests.length === 0) {
+                    verificationList.innerHTML = '<div class="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 card-hover text-gray-500">No pending verification requests.</div>';
+                    return;
+                }
+
+                verificationList.innerHTML = requests.map((request) => {
+                    const docUrl = `http://localhost:3000${request.aadhaar_file_path}`;
+                    const isPdf = request.aadhaar_file_type === 'application/pdf';
+                    return `
+                    <div class="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 card-hover">
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">${request.donor_name}</h3>
+                                <p class="text-xs text-gray-500">Request #${request.id} | ${new Date(request.created_at).toLocaleString()}</p>
+                            </div>
+                            <span class="px-2 py-1 rounded bg-amber-100 text-amber-800 text-xs font-medium">Pending</span>
+                        </div>
+                        <div class="space-y-2 text-sm text-gray-700">
+                            <p><span class="font-semibold">Aadhaar:</span> ${maskAadhaar(request.aadhaar_number)}</p>
+                            <p><span class="font-semibold">Phone:</span> ${request.donor_phone}</p>
+                            <p><span class="font-semibold">Call:</span> <a class="text-purple-600 hover:underline" href="tel:${request.donor_phone}">${request.donor_phone}</a></p>
+                            <p><span class="font-semibold">Document:</span> <a class="text-purple-600 hover:underline" target="_blank" href="${docUrl}">${isPdf ? 'View PDF' : 'View Image'}</a></p>
+                        </div>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <button onclick="updateVerification(${request.id}, 'approved')" class="px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 text-sm">
+                                <i class="fas fa-check mr-1"></i>Approve
+                            </button>
+                            <button onclick="updateVerification(${request.id}, 'rejected')" class="px-3 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700 text-sm">
+                                <i class="fas fa-times mr-1"></i>Reject
+                            </button>
+                            <a target="_blank" href="${docUrl}" class="px-3 py-2 rounded-lg border border-purple-200 text-purple-700 hover:bg-purple-50 text-sm">
+                                <i class="fas fa-eye mr-1"></i>Open Document
+                            </a>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                summary.textContent = 'Could not load verification queue';
+                verificationList.innerHTML = `<div class="bg-white rounded-2xl shadow-lg border border-red-200 p-6 text-red-700">${error.message}</div>`;
+            }
+        }
+
+        async function updateVerification(id, status) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/dashboard/verifications/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Update failed');
+                }
+                showToast(`Verification ${status}`);
+                fetchVerificationRequests();
+            } catch (error) {
+                showToast(error.message);
+            }
+        }
+
+        async function refreshData() {
+            const icon = document.getElementById('refreshIcon');
+            const text = document.getElementById('refreshText');
+            icon.classList.add('fa-spin');
+            text.textContent = 'Refreshing...';
+            await fetchVerificationRequests();
+            icon.classList.remove('fa-spin');
+            text.textContent = 'Refresh Queue';
+            showToast('Verification queue updated');
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            window.location.href = 'login.html';
+        }
+
+        async function deleteMyAccount() {
+            if (!confirm('Delete admin account permanently? This cannot be undone.')) return;
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/delete-account', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        role: 'admin',
+                        userId: localStorage.getItem('userId'),
+                        email: localStorage.getItem('userEmail')
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to delete account');
+                localStorage.clear();
+                window.location.href = 'register-admin.html';
+            } catch (err) {
+                showToast(err.message);
+            }
+        }
+
+        document.getElementById('refreshBtn').addEventListener('click', refreshData);
+
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+        });
+        sidebarClose.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        });
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        });
+
+        fetchVerificationRequests();
+    </script>
+    <script src="js/app.js"></script>
+</body>
+</html>

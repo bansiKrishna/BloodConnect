@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register as Facility - BloodConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%); }
+        .input-focus:focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
+        .step-active { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; }
+        .step-completed { background: #10b981; color: white; }
+        .step-pending { background: #e5e7eb; color: #6b7280; }
+        
+        /* Page transition */
+        .page-transition {
+            animation: pageFadeIn 0.4s ease-out;
+        }
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Button ripple effect */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .btn-ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen py-8 page-transition">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <a href="home.html" class="inline-flex items-center gap-3 group">
+                <div class="w-14 h-14 flex items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                    <i class="fas fa-hospital text-white text-2xl"></i>
+                </div>
+                <div class="text-left">
+                    <h1 class="text-2xl font-bold text-gray-900">BloodConnect</h1>
+                    <p class="text-sm text-gray-500">Blood Management System</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Registration Card -->
+        <div class="bg-white shadow-2xl rounded-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
+                <h2 class="text-2xl font-bold mb-2">Register Your Facility</h2>
+                <p class="text-blue-100">Join our network as a hospital or blood bank. Complete the registration form below.</p>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="flex items-center justify-center p-6 border-b border-gray-100">
+                <div class="flex items-center gap-4">
+                    <div class="step-item flex items-center gap-2">
+                        <div id="step1Indicator" class="w-8 h-8 rounded-full step-active flex items-center justify-center font-bold text-sm transition-all">1</div>
+                        <span class="text-sm font-medium text-gray-700">Facility Info</span>
+                    </div>
+                    <div class="w-12 h-0.5 bg-gray-200"></div>
+                    <div class="step-item flex items-center gap-2">
+                        <div id="step2Indicator" class="w-8 h-8 rounded-full step-pending flex items-center justify-center font-bold text-sm transition-all">2</div>
+                        <span class="text-sm font-medium text-gray-500">Contact Details</span>
+                    </div>
+                    <div class="w-12 h-0.5 bg-gray-200"></div>
+                    <div class="step-item flex items-center gap-2">
+                        <div id="step3Indicator" class="w-8 h-8 rounded-full step-pending flex items-center justify-center font-bold text-sm transition-all">3</div>
+                        <span class="text-sm font-medium text-gray-500">Verification</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form id="registrationForm" class="p-6">
+                <!-- Step 1: Facility Information -->
+                <div id="step1" class="step-content">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Facility Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Facility Name *</label>
+                            <div class="relative">
+                                <i class="fas fa-hospital absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" name="facilityName" required placeholder="Enter facility name"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Facility Type *</label>
+                            <select name="facilityType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                                <option value="">Select Type</option>
+                                <option value="hospital">Hospital</option>
+                                <option value="blood_bank">Blood Bank</option>
+                                <option value="clinic">Clinic</option>
+                                <option value="diagnostic_center">Diagnostic Center</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">License Number *</label>
+                            <div class="relative">
+                                <i class="fas fa-certificate absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" name="licenseNumber" required placeholder="Medical facility license number"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Year Established</label>
+                            <div class="relative">
+                                <i class="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="number" name="yearEstablished" min="1900" max="2026" placeholder="Year"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Number of Beds</label>
+                            <div class="relative">
+                                <i class="fas fa-bed absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="number" name="bedCount" min="1" placeholder="Number of beds"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Services Offered</label>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="services" value="blood_donation" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                                <span class="text-sm text-gray-700">Blood Donation</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="services" value="blood_storage" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                                <span class="text-sm text-gray-700">Blood Storage</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="services" value="blood_testing" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                                <span class="text-sm text-gray-700">Blood Testing</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="services" value="emergency_services" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                                <span class="text-sm text-gray-700">Emergency Services</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="services" value="transfusion" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                                <span class="text-sm text-gray-700">Transfusion Services</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="services" value="mobile_camps" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                                <span class="text-sm text-gray-700">Mobile Camps</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Contact Details -->
+                <div id="step2" class="step-content hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Contact Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Contact Person Name *</label>
+                            <div class="relative">
+                                <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" name="contactName" required placeholder="Primary contact person"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Designation *</label>
+                            <div class="relative">
+                                <i class="fas fa-id-badge absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" name="designation" required placeholder="e.g., Administrator, Director"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                            <div class="relative">
+                                <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="email" name="email" required placeholder="Official email address"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                            <div class="relative">
+                                <i class="fas fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="tel" name="phone" required placeholder="Contact phone number"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Emergency Contact</label>
+                            <div class="relative">
+                                <i class="fas fa-ambulance absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="tel" name="emergencyPhone" placeholder="Emergency contact number"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                            <div class="relative">
+                                <i class="fas fa-globe absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="url" name="website" placeholder="https://www.example.com"
+                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Facility Address *</label>
+                        <textarea name="address" required rows="3" placeholder="Enter complete facility address"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                            <input type="text" name="city" required placeholder="City"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">State *</label>
+                            <input type="text" name="state" required placeholder="State"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ZIP Code *</label>
+                            <input type="text" name="zipCode" required placeholder="ZIP Code"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Verification -->
+                <div id="step3" class="step-content hidden">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Account Setup & Verification</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Create Password *</label>
+                                <div class="relative">
+                                    <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <input type="password" name="password" required minlength="8" placeholder="Create a strong password"
+                                        class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                                    <button type="button" onclick="togglePassword(this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Password must be at least 8 characters</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password *</label>
+                                <div class="relative">
+                                    <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <input type="password" name="confirmPassword" required placeholder="Confirm your password"
+                                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                            <h4 class="font-medium text-blue-800 mb-2">Document Upload</h4>
+                            <p class="text-sm text-blue-600 mb-4">Please upload the following documents for verification:</p>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">License Certificate *</label>
+                                    <div class="flex items-center gap-3">
+                                        <input type="file" name="licenseDoc" accept=".pdf,.jpg,.jpeg,.png" required
+                                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Facility Photo</label>
+                                    <div class="flex items-center gap-3">
+                                        <input type="file" name="facilityPhoto" accept=".jpg,.jpeg,.png"
+                                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox" name="terms" required class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mt-0.5">
+                                <span class="text-sm text-gray-700">I confirm that all information provided is accurate and I have the authority to register this facility. I agree to the <a href="#" class="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a>. I understand that providing false information may result in rejection of this application.</span>
+                            </label>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox" name="notifications" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mt-0.5">
+                                <span class="text-sm text-gray-700">I would like to receive notifications about blood requests, system updates, and partnership opportunities from BloodConnect.</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between mt-8 pt-6 border-t border-gray-100">
+                    <button type="button" id="prevBtn" onclick="changeStep(-1)" class="hidden px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </button>
+                    <button type="button" id="nextBtn" onclick="changeStep(1)" class="btn-ripple ml-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl">
+                        Next <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                    <button type="submit" id="submitBtn" class="btn-ripple hidden ml-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl">
+                        <i class="fas fa-paper-plane mr-2"></i> Submit Application
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="text-center mt-6">
+            <a href="home.html" class="text-gray-500 hover:text-gray-700 text-sm flex items-center justify-center gap-2">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        function changeStep(direction) {
+            if (direction === 1 && !validateStep(currentStep)) {
+                return;
+            }
+
+            document.getElementById(`step${currentStep}`).classList.add('hidden');
+            currentStep += direction;
+            document.getElementById(`step${currentStep}`).classList.remove('hidden');
+
+            updateStepIndicators();
+            updateButtons();
+        }
+
+        function updateStepIndicators() {
+            for (let i = 1; i <= totalSteps; i++) {
+                const indicator = document.getElementById(`step${i}Indicator`);
+                if (i < currentStep) {
+                    indicator.className = 'w-8 h-8 rounded-full step-completed flex items-center justify-center font-bold text-sm transition-all';
+                    indicator.innerHTML = '<i class="fas fa-check"></i>';
+                } else if (i === currentStep) {
+                    indicator.className = 'w-8 h-8 rounded-full step-active flex items-center justify-center font-bold text-sm transition-all';
+                    indicator.innerHTML = i;
+                } else {
+                    indicator.className = 'w-8 h-8 rounded-full step-pending flex items-center justify-center font-bold text-sm transition-all';
+                    indicator.innerHTML = i;
+                }
+            }
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (currentStep === 1) {
+                prevBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+            }
+
+            if (currentStep === totalSteps) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+
+        function validateStep(step) {
+            const stepElement = document.getElementById(`step${step}`);
+            const requiredFields = stepElement.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (field.type === 'file') {
+                    if (field.files.length === 0) {
+                        isValid = false;
+                    }
+                } else if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('border-red-500');
+                } else {
+                    field.classList.remove('border-red-500');
+                }
+            });
+
+            if (!isValid) {
+                showToast('Please fill in all required fields');
+            }
+
+            return isValid;
+        }
+
+        function togglePassword(btn) {
+            const input = btn.parentElement.querySelector('input');
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const password = form.password.value;
+            const confirmPassword = form.confirmPassword.value;
+
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match');
+                return;
+            }
+
+            const facilityName = form.facilityName.value;
+            const facilityType = form.facilityType.value;
+            const email = form.email.value;
+            const phone = form.phone.value;
+            const city = form.city.value;
+            const state = form.state.value;
+            const location = city + ', ' + state;
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalBtnHtml = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/register-facility', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ facilityName, facilityType, email, phone, location, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (window.BloodConnect) {
+                        window.BloodConnect.showToast('Application submitted successfully! Redirecting to login...', 'success');
+                    } else {
+                        showToast('Application submitted successfully! Redirecting to login...');
+                    }
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2500);
+                } else {
+                    showToast(data.error || 'Registration failed');
+                    submitBtn.innerHTML = originalBtnHtml;
+                    submitBtn.disabled = false;
+                }
+            } catch (err) {
+                showToast('Network error. Could not connect to API.');
+                submitBtn.innerHTML = originalBtnHtml;
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+    <!-- Shared App JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>

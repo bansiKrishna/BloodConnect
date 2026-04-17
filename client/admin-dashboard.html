@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - BloodConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .sidebar { transition: all 0.3s ease; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        
+        /* Page transition */
+        .page-transition {
+            animation: pageFadeIn 0.4s ease-out;
+        }
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Button ripple effect */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .btn-ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-indigo-50 min-h-screen page-transition">
+    <!-- Header -->
+    <header class="bg-white/95 backdrop-blur-md shadow-sm border-b border-purple-100 sticky top-0 z-40">
+        <div class="flex justify-between items-center px-4 sm:px-6 py-3">
+            <div class="flex items-center gap-3">
+                <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg hover:bg-purple-100 text-purple-600 transition-all">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-xl bg-purple-100 shadow-sm">
+                        <i class="fas fa-clipboard-plus text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="hidden sm:block">
+                        <h1 class="text-lg sm:text-xl font-bold text-purple-700">Admin Panel</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">System Administration</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white font-bold shadow-lg border-2 border-white">
+                        <span id="userInitial">A</span>
+                    </div>
+                    <div class="hidden sm:block text-right">
+                        <span id="userName" class="font-medium block text-sm text-purple-700">Admin User</span>
+                        <span class="text-xs text-gray-500">Administrator</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="p-2 rounded-lg hover:bg-purple-100 text-purple-600 transition-all" title="Logout">
+                    <i class="fas fa-sign-out-alt text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex h-[calc(100vh-68px)] overflow-hidden">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar fixed lg:static top-[68px] bottom-0 lg:top-auto lg:bottom-auto left-0 z-50 w-64 bg-white shadow-xl border-r border-purple-100 transform -translate-x-full lg:translate-x-0 flex flex-col">
+            <div class="flex items-center justify-between p-4 border-b border-purple-100">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-purple-100">
+                        <i class="fas fa-shield-alt text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-sm text-purple-700">Admin</h2>
+                        <p class="text-xs text-gray-500">Panel</p>
+                    </div>
+                </div>
+                <button id="sidebarClose" class="lg:hidden p-1.5 rounded-lg hover:bg-purple-100 text-purple-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="flex-1 p-4 overflow-y-auto">
+                <div class="flex flex-col gap-1">
+                    <a href="admin-dashboard.html" class="flex items-center gap-3 w-full p-3 rounded-xl text-white shadow-md font-semibold transform scale-[1.02] bg-gradient-to-r from-purple-600 to-indigo-700">
+                        <i class="fas fa-chart-bar w-5"></i>
+                        <span class="flex-1 text-left text-sm">Overview</span>
+                    </a>
+                    <a href="admin-verification.html" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-purple-700 hover:bg-purple-50 transition-all">
+                        <i class="fas fa-shield-alt w-5"></i>
+                        <span class="flex-1 text-left text-sm">Verification</span>
+                    </a>
+                    <a href="admin-facilities.html" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-purple-700 hover:bg-purple-50 transition-all">
+                        <i class="fas fa-hospital w-5"></i>
+                        <span class="flex-1 text-left text-sm">Facilities</span>
+                    </a>
+                    <a href="#" onclick="showToast('Donors page coming soon!')" class="flex items-center gap-3 w-full p-3 rounded-xl text-gray-700 hover:text-purple-700 hover:bg-purple-50 transition-all">
+                        <i class="fas fa-users w-5"></i>
+                        <span class="flex-1 text-left text-sm">Donors</span>
+                    </a>
+                    <button onclick="deleteMyAccount()" class="flex items-center gap-3 w-full p-3 rounded-xl text-left text-rose-700 hover:bg-rose-50 transition-all">
+                        <i class="fas fa-user-times w-5"></i>
+                        <span class="flex-1 text-left text-sm">Delete Account</span>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="p-4 border-t border-purple-100">
+                <div class="p-3 rounded-lg bg-purple-100 text-purple-700 text-center">
+                    <p class="text-sm font-semibold">Blood Bank MS</p>
+                    <p class="text-xs mt-1 opacity-75">Save Lives, Donate Blood</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Overlay for mobile -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="p-2 bg-purple-100 rounded-xl">
+                            <i class="fas fa-shield-alt text-purple-600 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+                            <p class="text-gray-600 mt-1">Comprehensive overview of the blood bank management system</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="refreshData()" id="refreshBtn" class="flex items-center gap-2 px-4 py-2 bg-white border border-purple-200 rounded-lg text-purple-600 hover:bg-purple-50 transition-colors">
+                        <i id="refreshIcon" class="fas fa-sync-alt"></i>
+                        <span id="refreshText">Refresh Data</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Main Stats Grid -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-activity text-purple-600"></i> System Overview
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6" id="mainStats">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- System Alerts Section -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle text-purple-600"></i> System Alerts
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="systemAlerts">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-flask text-purple-600"></i> Quick Actions
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="quickActions">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Recent Activity Section -->
+            <div class="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 card-hover">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-activity text-purple-600"></i> Recent Activity
+                </h2>
+                <div id="recentActivity" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        // Check if logged in as admin
+        if (!localStorage.getItem('isLoggedIn') || localStorage.getItem('userRole') !== 'admin') {
+            window.location.href = 'login.html';
+        }
+
+        // Global state for fetched data
+        let dashboardData = { stats: {}, requests: [] };
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userName = localStorage.getItem('userName') || 'System Administrator';
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userInitial').textContent = userName.charAt(0);
+            
+            await fetchDashboardData();
+            renderQuickActions();
+        });
+
+        async function fetchDashboardData() {
+            try {
+                // Fetch stats
+                const statRes = await fetch('http://localhost:3000/api/dashboard/stats');
+                const statData = await statRes.json();
+                if(statData.success) dashboardData.stats = statData.stats;
+
+                // Fetch recent requests (mock activity mapping)
+                const reqRes = await fetch('http://localhost:3000/api/dashboard/requests?limit=5');
+                const reqData = await reqRes.json();
+                if(reqData.success) dashboardData.requests = reqData.requests;
+
+                renderMainStats();
+                renderSystemAlerts();
+                renderRecentActivity();
+
+            } catch (err) {
+                console.error('Error fetching dashboard data:', err);
+                showToast('Failed to load real-time data.');
+            }
+        }
+
+        function renderMainStats() {
+            const container = document.getElementById('mainStats');
+            const mainStats = [
+                { icon: 'fa-users', label: 'Total Donors', value: dashboardData.stats.totalDonors || 0, subtitle: 'Registered blood donors', color: 'red', href: '#' },
+                { icon: 'fa-hospital', label: 'Facilities', value: dashboardData.stats.totalFacilities || 0, subtitle: 'Hospitals & Labs', color: 'blue', href: 'admin-facilities.html' },
+                { icon: 'fa-clipboard-list', label: 'Total Requests', value: dashboardData.stats.totalRequests || 0, subtitle: 'Blood requests made', color: 'green', href: '#' },
+                { icon: 'fa-check', label: 'Fulfilled', value: dashboardData.stats.fulfilledRequests || 0, subtitle: 'Completed requests', color: 'purple', href: '#' },
+                { icon: 'fa-exclamation-triangle', label: 'Emergency', value: dashboardData.stats.emergencyRequests || 0, subtitle: 'Urgent requests', color: 'amber', href: '#' }
+            ];
+
+            container.innerHTML = mainStats.map(s => `
+                <div class="bg-white rounded-2xl shadow-lg border-l-4 border-${s.color}-400 p-6 card-hover ${s.href !== '#' ? 'cursor-pointer' : ''}" ${s.href !== '#' ? `onclick="window.location.href='${s.href}'"` : ''}>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600 mb-1">${s.label}</p>
+                            <p class="text-3xl font-bold text-gray-800">${s.value.toLocaleString()}</p>
+                            <p class="text-xs text-gray-500 mt-1">${s.subtitle}</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-${s.color}-100 text-${s.color}-600">
+                            <i class="fas ${s.icon} text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSystemAlerts() {
+            const container = document.getElementById('systemAlerts');
+            const alerts = [];
+            const pendingRequests = dashboardData.stats.pendingRequests || 0;
+            const emergencyRequests = dashboardData.stats.emergencyRequests || 0;
+
+            if (pendingRequests > 0) {
+                alerts.push({
+                    type: 'warning',
+                    title: 'Pending Requests',
+                    description: 'blood requests awaiting fulfillment',
+                    count: pendingRequests,
+                    icon: 'fa-clock'
+                });
+            }
+
+            if (emergencyRequests > 0) {
+                alerts.push({
+                    type: 'critical',
+                    title: 'Emergency Requests Alert',
+                    description: 'requests marked as critical/emergency',
+                    count: emergencyRequests,
+                    icon: 'fa-exclamation-triangle'
+                });
+            }
+
+            const alertConfig = {
+                warning: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-800', iconBg: 'bg-amber-100', iconColor: 'text-amber-600' },
+                critical: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-red-800', iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
+                info: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-800', iconBg: 'bg-blue-100', iconColor: 'text-blue-600' }
+            };
+
+            container.innerHTML = alerts.map(a => {
+                const config = alertConfig[a.type];
+                return `
+                    <div class="${config.bg} border ${config.border} rounded-2xl p-6 card-hover">
+                        <div class="flex items-center gap-4">
+                            <div class="p-3 rounded-xl ${config.iconBg} ${config.iconColor}">
+                                <i class="fas ${a.icon} text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold ${config.text}">${a.title}</h3>
+                                <p class="${config.text}">${a.count} ${a.description}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderQuickActions() {
+            const container = document.getElementById('quickActions');
+            const actions = [
+                { icon: 'fa-shield-alt', title: 'Verification Queue', description: 'Review Aadhaar uploads and donor contact details for approval', href: 'admin-verification.html', color: 'red' },
+                { icon: 'fa-hospital', title: 'Manage Facilities', description: 'Hospitals, labs and organizations directory', href: 'admin-facilities.html', color: 'blue' },
+                { icon: 'fa-tint', title: 'Donation History', description: 'View all donation records, analytics, and reports', href: '#', color: 'green' },
+                { icon: 'fa-calendar', title: 'Blood Camps', description: 'Monitor and manage upcoming blood donation camps', href: '#', color: 'purple' }
+            ];
+
+            container.innerHTML = actions.map(a => {
+                const clickAction = a.href !== '#' ? `window.location.href='${a.href}'` : `showToast('${a.title} clicked!')`;
+                return `
+                <div class="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 card-hover group cursor-pointer" onclick="${clickAction}">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="p-2 bg-purple-100 rounded-lg text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="fas ${a.icon}"></i>
+                        </div>
+                        <i class="fas fa-arrow-right text-gray-400 group-hover:text-purple-600 transition-colors"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2 group-hover:text-purple-600 transition-colors">${a.title}</h3>
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">${a.description}</p>
+                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium">
+                        Manage <i class="fas fa-arrow-right text-sm"></i>
+                    </button>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function renderRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            if(!dashboardData.requests || dashboardData.requests.length === 0){
+                 container.innerHTML = `<p class="text-gray-500 text-sm">No recent activity detected.</p>`;
+                 return;
+            }
+
+            container.innerHTML = dashboardData.requests.map(req => `
+                <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0 hover:bg-purple-50 rounded-lg px-3 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-purple-100 rounded-lg text-purple-600">
+                            <i class="fas fa-activity text-sm"></i>
+                        </div>
+                        <span class="text-sm text-gray-700">Request: ${req.units} units of ${req.blood_group} by ${req.requester_name} (${req.status})</span>
+                    </div>
+                    <span class="text-xs text-gray-500">${new Date(req.created_at).toLocaleDateString()}</span>
+                </div>
+            `).join('');
+        }
+
+        async function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            const icon = document.getElementById('refreshIcon');
+            const text = document.getElementById('refreshText');
+            
+            icon.classList.add('fa-spin');
+            text.textContent = 'Refreshing...';
+            btn.disabled = true;
+
+            await fetchDashboardData();
+
+            icon.classList.remove('fa-spin');
+            text.textContent = 'Refresh Data';
+            btn.disabled = false;
+            showToast('Dashboard updated successfully!');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function logout() {
+            if (window.BloodConnect) {
+                window.BloodConnect.confirm('Are you sure you want to logout?', function() {
+                    localStorage.removeItem('isLoggedIn');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('userEmail');
+                    window.BloodConnect.showToast('Logged out successfully', 'success');
+                    setTimeout(() => {
+                        window.BloodConnect.navigateTo('login.html');
+                    }, 1000);
+                });
+            } else {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('userEmail');
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function deleteMyAccount() {
+            if (!confirm('Delete admin account permanently? This cannot be undone.')) return;
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/delete-account', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        role: 'admin',
+                        userId: localStorage.getItem('userId'),
+                        email: localStorage.getItem('userEmail')
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to delete account');
+                localStorage.clear();
+                window.location.href = 'register-admin.html';
+            } catch (err) {
+                showToast(err.message);
+            }
+        }
+
+        // Sidebar toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+        });
+
+        sidebarClose.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        });
+        
+        // Show welcome toast
+        if (window.BloodConnect) {
+            setTimeout(() => {
+                window.BloodConnect.showToast('Welcome back, Admin!', 'success');
+            }, 500);
+        }
+    </script>
+    <!-- Shared App JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>

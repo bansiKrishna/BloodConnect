@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Details & Tracking - BloodConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 50%, #fecaca 100%); }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+            z-index: 10;
+        }
+
+        /* Marker Pulses */
+        .hospital-pulse {
+            width: 24px;
+            height: 24px;
+            background: #ef4444;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 0 0 rgba(239, 68, 68, 0.4);
+            animation: pulse-hospital 2s infinite;
+        }
+
+        .donor-pulse {
+            width: 24px;
+            height: 24px;
+            background: #10b981;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+            animation: pulse-donor 2s infinite;
+        }
+
+        @keyframes pulse-hospital {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        @keyframes pulse-donor {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Table Styles */
+        .styled-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        .styled-table tr:hover {
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="home.html" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg group-hover:scale-105 transition-all">
+                        <i class="fas fa-tint text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-gray-900 group-hover:text-red-600 transition-colors">BloodConnect</h1>
+                        <p class="text-xs text-gray-500 -mt-0.5 font-medium">Algorithmic Matching Engine</p>
+                    </div>
+                </a>
+                <a href="home.html" class="px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50 transition-all border border-gray-200">
+                    <i class="fas fa-arrow-left mr-1"></i> Back
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-8 flex flex-col gap-6">
+        
+        <!-- Component 1: Requested Blood Summary -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white shadow-lg shadow-red-500/30">
+                    <span class="text-2xl font-black drop-shadow-md" id="displayBg">--</span>
+                </div>
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider mb-2 border border-green-200">
+                        <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>
+                        Active Request
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Request <span id="displayReqId" class="font-mono text-gray-500">LOADING</span></h2>
+                </div>
+            </div>
+            
+            <div class="text-right hidden md:block">
+                <p class="text-sm font-semibold text-gray-500 mb-1">Algorithmic Process Status</p>
+                <div class="flex gap-2 items-center text-sm font-medium">
+                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded"><i class="fas fa-check text-xs"></i> 90-Day Filter</span>
+                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded"><i class="fas fa-check text-xs"></i> Proximity Expand</span>
+                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded"><i class="fas fa-check text-xs"></i> Priority Ranked</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6 h-auto lg:h-[600px]">
+            
+            <!-- Component 2: Table of Listed Eligible People -->
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden flex flex-col h-[500px] lg:h-full">
+                <div class="p-5 border-b border-gray-100 bg-gray-50 flex justify-between items-center flex-wrap gap-2">
+                    <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+                        <i class="fas fa-list-ol text-red-600"></i> Ranked Eligible Donors
+                    </h3>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-semibold text-gray-500 bg-gray-200 px-2 py-1 rounded-md">Radius: <span id="radiusFound">-</span>km</span>
+                    </div>
+                </div>
+                
+                <div class="overflow-y-auto flex-grow">
+                    <table class="w-full text-left border-collapse styled-table">
+                        <thead class="sticky top-0 bg-slate-50 shadow-sm z-10">
+                            <tr>
+                                <th class="p-4 font-semibold border-b border-gray-200">Rank</th>
+                                <th class="p-4 font-semibold border-b border-gray-200">Donor Details</th>
+                                <th class="p-4 font-semibold border-b border-gray-200">Location & Distance</th>
+                                <th class="p-4 font-semibold border-b border-gray-200" title="Determined by our algorithm weighing proximity, rare blood types, and response times.">Priority Score <i class="fas fa-info-circle text-[10px] text-gray-400"></i></th>
+                                <th class="p-4 font-semibold border-b border-gray-200 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="donorTableBody" class="divide-y divide-gray-100">
+                            <!-- Populated dynamically via JS -->
+                            <tr><td colspan="5" class="p-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i> Running matching algorithms...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Component 3: Google Maps (Leaflet) representation -->
+            <div class="bg-gray-100 rounded-2xl shadow-xl border border-gray-200 overflow-hidden relative h-[500px] lg:h-full">
+                <div class="absolute top-4 left-4 z-[400] bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg border border-gray-200 flex flex-col">
+                    <p class="text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Live Geo-spatial View</p>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="flex items-center gap-1 text-sm font-semibold text-gray-800"><div class="w-3 h-3 bg-red-500 rounded-full shadow"></div> Target Area</span>
+                        <span class="flex items-center gap-1 text-sm font-semibold text-gray-800"><div class="w-3 h-3 bg-green-500 rounded-full shadow"></div> Donors</span>
+                        <span class="flex items-center gap-1 text-sm font-semibold text-gray-800"><div class="w-3 h-3 bg-blue-500 rounded-full shadow"></div> Hospitals</span>
+                    </div>
+                </div>
+                <div id="map" class="w-full h-full"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let reqId = urlParams.get('id') || 'REQ-' + Math.floor(Math.random()*10000000);
+        let bgParam = urlParams.get('bg') || "O+";
+        
+        document.getElementById('displayReqId').textContent = reqId;
+        document.getElementById('displayBg').textContent = bgParam;
+
+        let map;
+        const donorMarkers = [];
+
+        // Global store — populated when match results arrive
+        let allDonorsData   = [];
+        let allHospitalsData = [];
+
+        function initMap(centerLat, centerLng, donors, hospitals = []) {
+            if (map) map.remove();
+            donorMarkers.length = 0;
+            map = L.map('map', { zoomControl: false }).setView([centerLat, centerLng], 13);
+            
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Target pin (red pulse)
+            const hospitalIcon = L.divIcon({
+                html: '<div class="hospital-pulse flex items-center justify-center text-white"><i class="fas fa-hospital text-[12px] pb-[1px]"></i></div>',
+                className: '', iconSize: [24, 24], iconAnchor: [12, 12]
+            });
+            L.marker([centerLat, centerLng], { icon: hospitalIcon }).addTo(map)
+                .bindPopup('<div class="font-bold text-gray-800 p-1"><i class="fas fa-map-marker-alt text-red-500 mr-1"></i>Your Request Location</div>');
+
+            // Plot each eligible donor with numbered rank badge
+            donors.forEach((donor, idx) => {
+                if (donor.distance > 100) {
+                    donorMarkers.push(null); // placeholder so index matches table rank
+                    return;
+                }
+
+                const rank = idx + 1;
+                const rankIcon = L.divIcon({
+                    html: `<div style="width:32px;height:32px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:13px;border:2px solid white;box-shadow:0 2px 8px rgba(16,185,129,0.6);">${rank}</div>`,
+                    className: '', iconSize: [32, 32], iconAnchor: [16, 16]
+                });
+
+                const isExactMatch = donor.blood_group === bgParam;
+                const matchLabel = isExactMatch ? 'Exact Match' : 'Compatible Donor';
+                const matchColor = isExactMatch ? 'bg-green-100 text-green-700 border-green-200' : 'bg-blue-100 text-blue-700 border-blue-200';
+                
+                const eligibleBadge = `<span style="background:${isExactMatch ? '#d1fae5' : '#dbeafe'};color:${isExactMatch ? '#065f46' : '#1e40af'};padding:1px 6px;border-radius:9px;font-size:10px;font-weight:700;border:1px solid ${isExactMatch ? '#6ee7b7' : '#93c5fd'};">✓ ${matchLabel}</span>`;
+
+                const popupHTML = `
+                <div style="font-family:Inter,sans-serif;padding:4px;min-width:220px;">
+                    <div style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid #f3f4f6;margin-bottom:8px;">
+                        <div style="width:36px;height:36px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:16px;flex-shrink:0;">${donor.name.charAt(0)}</div>
+                        <div>
+                            <div style="font-weight:700;color:#111827;font-size:14px;">#${rank} ${donor.name}</div>
+                            <div style="display:flex;gap:4px;margin-top:2px;">
+                                <span style="background:#fee2e2;color:#b91c1c;padding:1px 6px;border-radius:9px;font-size:10px;font-weight:700;">🩸 ${donor.blood_group}</span>
+                                ${eligibleBadge}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size:12px;color:#4b5563;line-height:1.6;">
+                        <div><i class="fas fa-map-marker-alt" style="width:16px;color:#ef4444;"></i> ${donor.address || donor.location || 'Berhampur'}</div>
+                        <div><i class="fas fa-phone-alt" style="width:16px;color:#3b82f6;"></i> ${donor.phone}</div>
+                        <div><i class="fas fa-route" style="width:16px;color:#8b5cf6;"></i> ${donor.distance} km away</div>
+                        <div><i class="fas fa-star" style="width:16px;color:#f59e0b;"></i> Priority Score: <strong>${Number(donor.score).toFixed(3)}</strong></div>
+                    </div>
+                    <button onclick="contactDonor('${donor.name.replace(/'/g, "\\'")}', '${donor.phone}', '${donor.email || ''}', this)" style="margin-top:10px;width:100%;background:linear-gradient(90deg,#ef4444,#dc2626);color:white;border:none;padding:7px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">
+                        <i class="fas fa-bolt"></i> Alert First Now
+                    </button>
+                </div>`;
+
+                const marker = L.marker([donor.lat, donor.lon], { icon: rankIcon }).addTo(map)
+                    .bindPopup(popupHTML, { maxWidth: 260 });
+                donorMarkers.push(marker);
+            });
+
+            // Plot hospitals (blue)
+            hospitals.forEach(hosp => {
+                const popupHTML = `<div style="font-family:Inter,sans-serif;padding:4px;">
+                    <div style="font-weight:700;color:#1e40af;font-size:13px;"><i class="fas fa-hospital" style="color:#3b82f6;margin-right:4px;"></i>${hosp.name}</div>
+                    <div style="font-size:11px;color:#4b5563;margin-top:4px;"><i class="fas fa-map-marker-alt"></i> ${hosp.address}</div>
+                    <div style="font-size:11px;color:#4b5563;"><i class="fas fa-phone"></i> ${hosp.phone}</div>
+                    <div style="font-size:11px;color:#6b7280;">~${hosp.distance} km away</div>
+                </div>`;
+                const hospIcon = L.divIcon({
+                    html: '<div style="width:28px;height:28px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;border:2px solid white;box-shadow:0 2px 6px rgba(59,130,246,0.5);"><i class="fas fa-h-square"></i></div>',
+                    className: '', iconSize: [28, 28], iconAnchor: [14, 14]
+                });
+                L.marker([hosp.lat, hosp.lon], { icon: hospIcon }).addTo(map).bindPopup(popupHTML);
+            });
+
+            // Smart bounds — fit to nearby donors + hospitals only
+            const nearby = donors.filter(d => d.distance <= 100);
+            if (nearby.length > 0 || hospitals.length > 0) {
+                const bounds = L.latLngBounds([[centerLat, centerLng]]);
+                nearby.forEach(d => bounds.extend([d.lat, d.lon]));
+                hospitals.forEach(h => bounds.extend([h.lat, h.lon]));
+                map.fitBounds(bounds, { padding: [60, 60] });
+            }
+        }
+
+        // Called from table row "View" button — pans map to that donor and opens their popup
+        function focusDonorOnMap(idx) {
+            const marker = donorMarkers[idx];
+            if (!marker) {
+                alert('This donor is too far to display on the local map.');
+                return;
+            }
+            map.flyTo(marker.getLatLng(), 15, { animate: true, duration: 0.8 });
+            setTimeout(() => marker.openPopup(), 900);
+        }
+
+        async function fetchAlgorithmMatches(lat, lon) {
+            const tableBody = document.getElementById('donorTableBody');
+            try {
+                // Use relative URL so it always hits the same server serving this page
+                const response = await fetch('/api/match/find', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bloodGroup: bgParam, lat: lat, lon: lon })
+                });
+
+                if(!response.ok) {
+                    const errText = await response.text();
+                    throw new Error('Backend error ' + response.status + ': ' + errText);
+                }
+                const data = await response.json();
+
+                if(!data.success || !data.donors || data.donors.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500 font-medium"><i class="fas fa-search text-3xl mb-2 block text-gray-300"></i>No eligible ${bgParam} donors found nearby.<br><span class="text-xs mt-1 block">All registered donors of this blood group may be within the 90-day donation restriction.</span></td></tr>`;
+                    document.getElementById('radiusFound').textContent = data.found_radius || '--';
+                    initMap(lat, lon, [], data.hospitals || []);
+                    return;
+                }
+
+                // Show real search radius
+                const displayRadius = data.found_radius > 9999 ? 'Global' : data.found_radius + ' km';
+                document.getElementById('radiusFound').textContent = displayRadius;
+
+                tableBody.innerHTML = data.donors.map((donor, idx) => {
+                    const isExactMatch = donor.blood_group === bgParam;
+                    const matchIcon = isExactMatch ? 'fa-check-circle' : 'fa-handshake';
+                    const matchText = isExactMatch ? 'Exact Match' : 'Compatible Donor';
+                    const badgeClass = isExactMatch ? 'bg-green-100 text-green-700 border-green-200' : 'bg-blue-100 text-blue-700 border-blue-200';
+                    const rowClass = isExactMatch ? 'hover:bg-green-50/30' : 'hover:bg-blue-50/30';
+
+                    // Find the nearest hospital to this donor
+                    const hospitals = data.hospitals || [];
+                    let nearestHosp = hospitals.length > 0 ? hospitals[0] : null;
+                    if (hospitals.length > 1 && donor.lat && donor.lon) {
+                        nearestHosp = hospitals.reduce((closest, h) => {
+                            const dh = Math.hypot(h.lat - donor.lat, h.lon - donor.lon);
+                            const dc = Math.hypot(closest.lat - donor.lat, closest.lon - donor.lon);
+                            return dh < dc ? h : closest;
+                        });
+                    }
+
+                    // Safely encode hospital & location for inline onclick
+                    const hospJson = nearestHosp
+                        ? JSON.stringify({ name: nearestHosp.name, address: nearestHosp.address, phone: nearestHosp.phone }).replace(/'/g, "\\'")
+                        : 'null';
+                    const donorLoc = (donor.address || donor.location || 'Berhampur').replace(/'/g, "\\'");
+
+                    return `
+                    <tr class="${rowClass} transition-colors">
+                        <td class="p-4 border-b border-gray-100">
+                            <span class="w-8 h-8 rounded-full bg-red-50 border border-red-200 flex items-center justify-center font-bold text-red-600 text-sm">${idx + 1}</span>
+                        </td>
+                        <td class="p-4 border-b border-gray-100">
+                            <p class="font-bold text-gray-800">${donor.name} <span class="ml-2 px-2 py-0.5 ${badgeClass} text-[10px] rounded border whitespace-nowrap"><i class="fas ${matchIcon} mr-0.5"></i>${matchText}</span></p>
+                            <p class="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5"><i class="fas fa-phone-alt text-gray-400"></i> ${donor.phone}</p>
+                            <p class="text-[11px] text-red-500 font-semibold mt-0.5"><i class="fas fa-tint"></i> ${donor.blood_group}</p>
+                        </td>
+                        <td class="p-4 border-b border-gray-100">
+                            <p class="font-semibold text-gray-800 text-sm">${donor.distance} km away</p>
+                            <p class="text-[11px] text-gray-500 mt-0.5" title="${donor.address || donor.location || 'Berhampur'}"><i class="fas fa-map-marker-alt text-red-400"></i> ${donor.address || donor.location || 'Berhampur'}</p>
+                            ${nearestHosp ? `<p class="text-[11px] text-blue-500 mt-0.5"><i class="fas fa-hospital"></i> Near: ${nearestHosp.name}</p>` : ''}
+                        </td>
+                        <td class="p-4 border-b border-gray-100">
+                            <span class="font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg text-sm border border-green-200">${Number(donor.score).toFixed(3)}</span>
+                        </td>
+                        <td class="p-4 border-b border-gray-100 text-right">
+                            <div class="flex flex-col gap-1 items-end">
+                                <button class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:from-red-600 hover:to-red-700 shadow-md flex items-center gap-1 transition-all transform hover:scale-105" onclick="contactDonor('${donor.name.replace(/'/g, "\\'")}', '${donor.phone}', '${donor.email || ''}', this, '${donorLoc}', ${hospJson === 'null' ? null : "JSON.parse('" + hospJson + "')"})">
+                                    <i class="fas fa-bolt"></i> Alert First
+                                </button>
+                                <button class="bg-blue-50 text-blue-600 border border-blue-200 px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-100 flex items-center gap-1 transition-all" onclick="focusDonorOnMap(${idx})">
+                                    <i class="fas fa-map-pin"></i> View on Map
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    `;
+                }).join('');
+
+
+                initMap(lat, lon, data.donors, data.hospitals || []);
+
+            } catch(e) {
+                console.error('Backend fetch failed:', e);
+                tableBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center"><div class="inline-flex flex-col items-center gap-2 text-red-600"><i class="fas fa-exclamation-triangle text-3xl"></i><p class="font-bold">Could not connect to server</p><p class="text-xs text-gray-500 max-w-xs text-center">${e.message}.<br>Make sure the Node.js server is running: <code class="bg-gray-100 px-1 rounded">npm start</code></p></div></td></tr>`;
+                document.getElementById('radiusFound').textContent = 'Error';
+            }
+        }
+
+
+        async function contactDonor(name, phone, email, btnElement, donorLocation, nearestHospital) {
+            if(!confirm('Dispatch WhatsApp + Email Alert to ' + name + ' (' + phone + ')?')) return;
+            
+            const originalBtnHtml = btnElement.innerHTML;
+            btnElement.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Dispatching Alert...';
+            btnElement.disabled = true;
+            btnElement.className = "bg-gray-400 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-md flex items-center gap-1 cursor-wait";
+
+            try {
+                showToast('📲 Sending WhatsApp Alert to ' + name + '...', 'info');
+
+                // Use the session's logged-in user info as the "recipient" (person who needs blood)
+                const loggedInUser = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}');
+
+                const response = await fetch('/api/match/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        donorName: name,
+                        donorPhone: phone,
+                        donorEmail: email,
+                        requestBloodGroup: bgParam,
+                        trackingId: reqId,
+                        donorLocation: donorLocation || 'Berhampur Region',
+                        recipientDetails: {
+                            name: loggedInUser.name || loggedInUser.facilityName || 'Emergency Patient',
+                            phone: loggedInUser.phone || 'Contact Hospital'
+                        },
+                        hospitalDetails: nearestHospital || null
+                    })
+                });
+
+                const data = await response.json();
+
+                // STRICT CHECK: Only proceed if backend explicitly confirms SMS was sent
+                if (!response.ok || !data.success) {
+                    // Something failed - show real error and reset button
+                    const errorMsg = data.message || 'Unknown error from server';
+                    
+                    // Check if it's a Twilio configuration error
+                    if (errorMsg.includes('credentials') || errorMsg.includes('Twilio')) {
+                        showToast('❌ Twilio not configured! See setup guide below.', 'error');
+                        // Show config modal
+                        showTwilioSetupGuide();
+                    } else {
+                        showToast('❌ SMS failed: ' + errorMsg, 'error');
+                    }
+                    btnElement.innerHTML = originalBtnHtml;
+                    btnElement.disabled = false;
+                    return;
+                }
+                
+                // SUCCESS: SMS was actually sent via Twilio
+                console.log('[BloodConnect] SMS dispatched! Twilio SID:', data.twilioSID);
+                showToast('✅ SMS message sent to donor! Waiting for their reply...', 'success');
+                btnElement.innerHTML = '<i class="fas fa-robot text-yellow-300"></i> Awaiting Reply...';
+                btnElement.classList.replace('bg-gray-400', 'bg-slate-700');
+                
+                // ==========================================
+                // REAL POLLING: Only triggers when Twilio webhook updates DB
+                // ==========================================
+                let pollCount = 0;
+                const pollInterval = setInterval(async () => {
+                    try {
+                        const statRes = await fetch(`/api/webhook/status?phone=${encodeURIComponent(phone)}`);
+                        const statData = await statRes.json();
+                        
+                        if (statData.status === "YES") {
+                            clearInterval(pollInterval);
+                            showToast(`💬 [SMS] ${name} replied YES (Available to Donate 🟢)!`, 'success');
+                            
+                            const tableRow = btnElement.closest('tr');
+                            tableRow.style.background = '#f0fdf4';
+                            tableRow.style.borderLeft = "4px solid #10b981";
+                            
+                            const actionContainer = btnElement.parentElement;
+                            actionContainer.innerHTML = `
+                                <span class="text-xs font-bold text-green-600 mb-1 bg-green-100 px-2 py-1 rounded"><i class="fas fa-sms"></i> Donor Confirmed</span>
+                                <button class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-[0_0_15px_rgba(16,185,129,0.5)] flex items-center gap-1 animate-pulse" onclick="showLiveTracking('${name}')">
+                                    <i class="fas fa-location-arrow"></i> Live Track Donor
+                                </button>
+                            `;
+                        } else if (statData.status === "NO") {
+                            clearInterval(pollInterval);
+                            showToast(`💬 [SMS] ${name} replied NO (Unavailable 🔴)`, 'error');
+                            btnElement.innerHTML = '<i class="fas fa-times text-red-300"></i> Declined';
+                            btnElement.classList.replace('bg-slate-700', 'bg-red-800');
+                        }
+                    } catch (e) {
+                        console.error("Polling error:", e);
+                    }
+                    
+                    pollCount++;
+                    if (pollCount > 300) { // Stop after ~10 mins
+                        clearInterval(pollInterval);
+                        if(btnElement.innerHTML.includes('Awaiting')) {
+                            btnElement.innerHTML = '<i class="fas fa-history text-gray-300"></i> No Response';
+                            btnElement.classList.replace('bg-slate-700', 'bg-gray-600');
+                        }
+                    }
+                }, 2000);
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to connect to Bot server.', 'error');
+                btnElement.innerHTML = originalBtnHtml;
+                btnElement.disabled = false;
+            }
+        }
+        
+        function showLiveTracking(donorName) {
+            alert('📍 Live Tracking activated for ' + donorName + '!\n\nDonor has confirmed availability. Hospital staff can now coordinate pickup.\n\n(GPS real-time tracking module requires donor app integration.)');
+        }
+
+        function showTwilioSetupGuide() {
+            // Create modal overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'twilioModal';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+            overlay.innerHTML = `
+                <div style="background:#fff;border-radius:16px;max-width:560px;width:100%;padding:32px;font-family:sans-serif;position:relative;max-height:90vh;overflow-y:auto;">
+                    <button onclick="document.getElementById('twilioModal').remove()" style="position:absolute;top:16px;right:16px;background:#f3f4f6;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;line-height:1;">✕</button>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                        <div style="background:#25D366;border-radius:10px;padding:10px;font-size:24px;">📱</div>
+                        <div>
+                            <h2 style="margin:0;color:#111827;font-size:20px;">Twilio SMS Setup Required</h2>
+                            <p style="margin:4px 0 0;color:#6b7280;font-size:13px;">3 steps to activate real donor alerts</p>
+                        </div>
+                    </div>
+
+                    <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#92400e;">
+                        ⚠️ Twilio credentials are missing in <code style="background:#fde68a;padding:2px 6px;border-radius:4px;">server/.env</code>. SMS alerts cannot be sent without them.
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:16px;">
+                        <div style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;">
+                            <div style="font-weight:bold;color:#111827;margin-bottom:6px;">Step 1 — Get Twilio Credentials</div>
+                            <p style="margin:0;color:#4b5563;font-size:13px;">Go to <a href="https://www.twilio.com/try-twilio" target="_blank" style="color:#2563eb;">twilio.com/try-twilio</a> → Sign up free → Copy your <strong>Account SID</strong> and <strong>Auth Token</strong> from the dashboard.</p>
+                        </div>
+                        <div style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;">
+                            <div style="font-weight:bold;color:#111827;margin-bottom:6px;">Step 2 — Fill in <code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">server/.env</code></div>
+                            <pre style="background:#111827;color:#f8f8f2;border-radius:8px;padding:12px;font-size:12px;overflow-x:auto;margin:8px 0 0;">TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_MESSAGING_SERVICE_SID=MG...</pre>
+                        </div>
+                        
+                        <div style="border:1px solid #dbeafe;background:#eff6ff;border-radius:10px;padding:16px;">
+                            <div style="font-weight:bold;color:#1e40af;margin-bottom:6px;">Step 3 — Expose Webhook (for local dev)</div>
+                            <p style="margin:0 0 8px;color:#1e40af;font-size:13px;">Run this in a new terminal to expose your local server:</p>
+                            <pre style="background:#111827;color:#a3e635;border-radius:8px;padding:10px;font-size:12px;margin:0;">npx ngrok http 3000</pre>
+                            <p style="margin:8px 0 0;color:#6b7280;font-size:12px;">Copy the HTTPS URL → Paste into Twilio Console → Messaging Services → Webhook → "Send a webhook" → set to:<br><code>https://xxxx.ngrok.app/api/webhook/sms</code></p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:20px;text-align:center;">
+                        <button onclick="document.getElementById('twilioModal').remove()" style="background:linear-gradient(135deg,#dc2626,#b91c1c);color:white;border:none;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:bold;cursor:pointer;">Got it, I'll set this up</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        // Shared Toast utility (since track request page didn't have it natively integrated yet)
+        function showToast(message, type = 'info') {
+            let toast = document.getElementById('globalToast');
+            if(!toast) {
+                toast = document.createElement('div');
+                toast.id = 'globalToast';
+                document.body.appendChild(toast);
+            }
+            const colors = { success: 'bg-green-600', error: 'bg-red-600', warning: 'bg-yellow-600', info: 'bg-blue-600' };
+            toast.className = `fixed bottom-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 z-[9999]`;
+            toast.textContent = message;
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // Get browser location or default to Delhi
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => fetchAlgorithmMatches(pos.coords.latitude, pos.coords.longitude),
+                (err) => fetchAlgorithmMatches(19.3149, 84.7940),
+                { timeout: 5000 }
+            );
+        } else {
+            fetchAlgorithmMatches(19.3149, 84.7940);
+        }
+
+    </script>
+</body>
+</html>
