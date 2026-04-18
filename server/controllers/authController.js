@@ -16,7 +16,7 @@ exports.registerDonor = (req, res) => {
     const mockLat = 19.3149 + (Math.random() * 0.04 - 0.02);
     const mockLon = 84.7940 + (Math.random() * 0.04 - 0.02);
 
-    const aadhaarFilePath = `/uploads/aadhaar/${aadhaarFile.filename}`;
+    const aadhaarFilePath = process.env.RENDER ? `/tmp/uploads/aadhaar/${aadhaarFile.filename}` : `/uploads/aadhaar/${aadhaarFile.filename}`;
     const sql = `INSERT INTO donors (name, email, phone, blood_group, location, address, lat, lon, responsiveness, aadhaar_number, aadhaar_file_path, aadhaar_file_type, verification_status, last_donation_date, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NULL, ?)`;
     db.run(sql, [fullName, email, phone, bloodGroup || 'O+', location || '', location || '', mockLat, mockLon, 1.0, aadhaarNumber, aadhaarFilePath, aadhaarFile.mimetype, password], function(err) {
         if (err) {

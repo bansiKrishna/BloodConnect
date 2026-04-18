@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve frontend assets
 app.use(express.static(path.join(__dirname, '../client')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(process.env.RENDER ? '/tmp/uploads' : path.join(__dirname, 'uploads')));
 
 // Redirect root to home.html
 app.get('/', (req, res) => {

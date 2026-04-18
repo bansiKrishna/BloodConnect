@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const authController = require('../controllers/authController');
 
-const uploadDir = path.resolve(__dirname, '../uploads/aadhaar');
+const uploadDir = process.env.RENDER ? '/tmp/uploads/aadhaar' : path.resolve(__dirname, '../uploads/aadhaar');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
