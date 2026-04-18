@@ -1,4 +1,5 @@
 // BloodConnect App - Shared JavaScript for all pages
+
 (function() {
     'use strict';
 

@@ -204,62 +204,37 @@ const btnLoader = document.getElementById('btnLoader');
 const errorMessage = document.getElementById('errorMessage');
 const errorText = document.getElementById('errorText');
 
-// 🔥 FIX: Retry login (handles Render sleep)
+// 🔥 FIX: Proper login request with retry logic (handles Render cold start)
 async function loginRequest(body) {
     const url = "https://bloodconnect-vdiz.onrender.com/api/auth/login";
+    const maxRetries = 3;
+    let lastError;
 
-    try {
-    console.log("Calling API...");
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            console.log(`Login attempt ${attempt}/${maxRetries}...`);
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
 
-    const response = await loginRequest({
-        role: selectedRole,
-        email,
-        password
-    });
+            console.log("Response status:", response.status);
+            return response;
 
-    console.log("Response received:", response);
-
-    let data;
-    try {
-        data = await response.json();
-    } catch (e) {
-        console.error("JSON parse failed:", e);
-        throw new Error("Invalid server response");
+        } catch (err) {
+            lastError = err;
+            console.error(`Attempt ${attempt} failed:`, err.message);
+            
+            if (attempt < maxRetries) {
+                console.log(`Retrying in 2 seconds...`);
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
     }
 
-    console.log("Response data:", data);
-
-    if (response.ok) {
-        localStorage.setItem('userRole', data.role);
-        localStorage.setItem('userId', data.user?.id || '');
-        localStorage.setItem('userEmail', data.user?.email || '');
-        localStorage.setItem('userName', data.user?.name || '');
-        localStorage.setItem('userPhone', data.user?.phone || '');
-        localStorage.setItem('userBloodGroup', data.user?.blood_group || '');
-        localStorage.setItem('userLocation', data.user?.location || '');
-        localStorage.setItem('isLoggedIn', 'true');
-
-        window.location.href = {
-            donor: 'donor-dashboard.html',
-            admin: 'admin-dashboard.html',
-            hospital: 'hospital-dashboard.html',
-            lab: 'lab-dashboard.html'
-        }[data.role];
-
-    } else {
-        console.error("Backend error:", data);
-        showError(data.error || "Login failed");
-    }
-
-} catch (err) {
-    console.error("FULL ERROR:", err);
-
-    if (err.message.includes("Failed to fetch")) {
-        showError("Server is waking up... try again in 2 seconds");
-    } else {
-        showError(err.message || "Something went wrong");
-    }
-}
+    throw lastError || new Error('Failed to connect to API after ' + maxRetries + ' attempts');
 }
 
 // Login submit
