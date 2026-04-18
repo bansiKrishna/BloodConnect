@@ -170,7 +170,13 @@
 // Role selection
 let selectedRole = 'donor';
 const roleBtns = document.querySelectorAll('.role-btn');
-async function loginRequest(body) { ... }
+
+// Default selected role
+const defaultRoleBtn = document.querySelector('[data-role="donor"]');
+if (defaultRoleBtn) {
+    defaultRoleBtn.classList.remove('border-gray-200', 'text-gray-600');
+    defaultRoleBtn.classList.add('border-red-500', 'bg-red-50', 'text-red-700');
+}
 
 roleBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -216,7 +222,10 @@ async function loginRequest(body) {
             
             const response = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify(body)
             });
 
@@ -288,13 +297,18 @@ loginForm.addEventListener('submit', async (e) => {
                     donor: 'donor-dashboard.html',
                     admin: 'admin-dashboard.html',
                     hospital: 'hospital-dashboard.html',
-                    lab: 'lab-dashboard.html'
+                    lab: 'lab-dashboard.html',
+                    blood_bank: 'hospital-dashboard.html',
+                    clinic: 'hospital-dashboard.html',
+                    diagnostic_center: 'hospital-dashboard.html'
                 };
 
+                const redirectPage = redirects[data.role] || redirects[selectedRole] || 'login.html';
+
                 if (window.BloodConnect) {
-                    window.BloodConnect.navigateTo(redirects[data.role]);
+                    window.BloodConnect.navigateTo(redirectPage);
                 } else {
-                    window.location.href = redirects[data.role];
+                    window.location.href = redirectPage;
                 }
             }, 1000);
 

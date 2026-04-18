@@ -112,10 +112,16 @@ exports.login = (req, res) => {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
         
-        // Find the actual role for facilities
+        // Find the actual role for facilities.
+        // Normalize facility subtypes so login redirects consistently.
         let finalRole = role;
         if (table === 'facilities') {
-            finalRole = user.type || 'hospital';
+            const facilityType = (user.type || '').toLowerCase();
+            if (facilityType === 'lab') {
+                finalRole = 'lab';
+            } else {
+                finalRole = 'hospital';
+            }
         }
         if (table === 'admins') {
             finalRole = 'admin';
