@@ -33,7 +33,7 @@
 
         async function fetchRequests() {
             const statusFilter = document.getElementById('statusFilter').value;
-            const res = await fetch('http://localhost:3000/api/dashboard/requests?limit=100');
+            const res = await fetch('https://bloodconnect-vdiz.onrender.com/api/dashboard/requests?limit=100');
             const data = await res.json();
             const list = document.getElementById('requestsList');
             let requests = data.requests || [];
@@ -63,7 +63,7 @@
         }
 
         async function updateStatus(id, status) {
-            const res = await fetch(`http://localhost:3000/api/dashboard/requests/${id}/status`, {
+            const res = await fetch(`https://bloodconnect-vdiz.onrender.com/api/dashboard/requests/${id}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })

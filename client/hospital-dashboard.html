@@ -277,17 +277,17 @@
         async function fetchDashboardData() {
             try {
                 // Fetch stats
-                const statRes = await fetch('http://localhost:3000/api/dashboard/stats');
+                const statRes = await fetch('https://bloodconnect-vdiz.onrender.com/api/dashboard/stats');
                 const statData = await statRes.json();
                 if(statData.success) dashboardData.stats = statData.stats;
 
                 // Fetch donors
-                const donorRes = await fetch('http://localhost:3000/api/dashboard/donors?limit=6');
+                const donorRes = await fetch('https://bloodconnect-vdiz.onrender.com/api/dashboard/donors?limit=6');
                 const donorData = await donorRes.json();
                 if(donorData.success) dashboardData.donors = donorData.donors;
 
                 // Fetch requests
-                const reqRes = await fetch('http://localhost:3000/api/dashboard/requests?limit=5');
+                const reqRes = await fetch('https://bloodconnect-vdiz.onrender.com/api/dashboard/requests?limit=5');
                 const reqData = await reqRes.json();
                 if(reqData.success) dashboardData.requests = reqData.requests;
 
@@ -536,7 +536,7 @@
         async function deleteMyAccount() {
             if (!confirm('Delete hospital account permanently? This cannot be undone.')) return;
             try {
-                const response = await fetch('http://localhost:3000/api/auth/delete-account', {
+                const response = await fetch('https://bloodconnect-vdiz.onrender.com/api/auth/delete-account', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

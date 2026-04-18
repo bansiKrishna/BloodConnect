@@ -462,7 +462,7 @@
                 formData.append('aadhaarNumber', aadhaarNumber);
                 formData.append('aadhaarFile', aadhaarFile);
 
-                const response = await fetch('http://localhost:3000/api/auth/register-donor', {
+                const response = await fetch('https://bloodconnect-vdiz.onrender.com/api/auth/register-donor', {
                     method: 'POST',
                     body: formData
                 });

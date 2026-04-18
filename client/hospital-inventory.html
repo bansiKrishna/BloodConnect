@@ -46,7 +46,7 @@
 
         async function fetchInventory() {
             const facilityId = localStorage.getItem('userId');
-            const res = await fetch(`http://localhost:3000/api/dashboard/inventory?facility_id=${facilityId}`);
+            const res = await fetch(`https://bloodconnect-vdiz.onrender.com/api/dashboard/inventory?facility_id=${facilityId}`);
             const data = await res.json();
             const list = document.getElementById('inventoryList');
             const rows = data.inventory || [];
@@ -75,7 +75,7 @@
                 availability_status: form.availability_status.value,
                 notes: form.notes.value
             };
-            const res = await fetch('http://localhost:3000/api/dashboard/inventory', {
+            const res = await fetch('https://bloodconnect-vdiz.onrender.com/api/dashboard/inventory', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

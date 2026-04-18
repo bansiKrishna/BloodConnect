@@ -211,7 +211,7 @@
         }
 
         async function fetchFacilities() {
-            const res = await fetch('http://localhost:3000/api/dashboard/facility-directory');
+            const res = await fetch('https://bloodconnect-vdiz.onrender.com/api/dashboard/facility-directory');
             const data = await safeParseJson(res);
             if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load facilities');
             const tbody = document.getElementById('facilityTableBody');
@@ -228,7 +228,7 @@
         }
 
         async function fetchOrganizations() {
-            const res = await fetch('http://localhost:3000/api/dashboard/organizations');
+            const res = await fetch('https://bloodconnect-vdiz.onrender.com/api/dashboard/organizations');
             const data = await safeParseJson(res);
             if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load organizations');
             const orgGrid = document.getElementById('orgGrid');
@@ -270,7 +270,7 @@
                 longitude: form.longitude.value ? parseFloat(form.longitude.value) : null
             };
             try {
-                const res = await fetch('http://localhost:3000/api/dashboard/facility-directory', {
+                const res = await fetch('https://bloodconnect-vdiz.onrender.com/api/dashboard/facility-directory', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -308,7 +308,7 @@
         async function deleteMyAccount() {
             if (!confirm('Delete admin account permanently? This cannot be undone.')) return;
             try {
-                const response = await fetch('http://localhost:3000/api/auth/delete-account', {
+                const response = await fetch('https://bloodconnect-vdiz.onrender.com/api/auth/delete-account', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

@@ -612,7 +612,7 @@
         const requester_id = localStorage.getItem('userId') || null;
         const requester_type = localStorage.getItem('userRole') === 'hospital' ? 'facility' : 'donor';
 
-        fetch('http://localhost:3000/api/dashboard/requests', {
+        fetch('https://bloodconnect-vdiz.onrender.com/api/dashboard/requests', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ blood_group, units, urgency, requester_id, requester_type })

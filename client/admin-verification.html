@@ -161,7 +161,7 @@
         async function fetchVerificationRequests() {
             verificationList.innerHTML = '<div class="text-gray-500">Loading verification requests...</div>';
             try {
-                const response = await fetch('http://localhost:3000/api/dashboard/verifications?status=pending');
+                const response = await fetch('https://bloodconnect-vdiz.onrender.com/api/dashboard/verifications?status=pending');
                 const data = await response.json();
                 if (!response.ok || !data.success) {
                     throw new Error(data.message || 'Failed to load verification queue');
@@ -176,7 +176,7 @@
                 }
 
                 verificationList.innerHTML = requests.map((request) => {
-                    const docUrl = `http://localhost:3000${request.aadhaar_file_path}`;
+                    const docUrl = `https://bloodconnect-vdiz.onrender.com${request.aadhaar_file_path}`;
                     const isPdf = request.aadhaar_file_type === 'application/pdf';
                     return `
                     <div class="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 card-hover">
@@ -215,7 +215,7 @@
 
         async function updateVerification(id, status) {
             try {
-                const response = await fetch(`http://localhost:3000/api/dashboard/verifications/${id}`, {
+                const response = await fetch(`https://bloodconnect-vdiz.onrender.com/api/dashboard/verifications/${id}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status })
@@ -253,7 +253,7 @@
         async function deleteMyAccount() {
             if (!confirm('Delete admin account permanently? This cannot be undone.')) return;
             try {
-                const response = await fetch('http://localhost:3000/api/auth/delete-account', {
+                const response = await fetch('https://bloodconnect-vdiz.onrender.com/api/auth/delete-account', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
