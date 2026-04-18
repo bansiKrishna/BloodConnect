@@ -170,6 +170,7 @@
 // Role selection
 let selectedRole = 'donor';
 const roleBtns = document.querySelectorAll('.role-btn');
+async function loginRequest(body) { ... }
 
 roleBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -208,22 +209,57 @@ async function loginRequest(body) {
     const url = "https://bloodconnect-vdiz.onrender.com/api/auth/login";
 
     try {
-        return await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body)
-        });
-    } catch (err) {
-        console.log("Server sleeping... retrying in 2s");
+    console.log("Calling API...");
 
-        await new Promise(resolve => setTimeout(resolve, 2000));
+    const response = await loginRequest({
+        role: selectedRole,
+        email,
+        password
+    });
 
-        return fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body)
-        });
+    console.log("Response received:", response);
+
+    let data;
+    try {
+        data = await response.json();
+    } catch (e) {
+        console.error("JSON parse failed:", e);
+        throw new Error("Invalid server response");
     }
+
+    console.log("Response data:", data);
+
+    if (response.ok) {
+        localStorage.setItem('userRole', data.role);
+        localStorage.setItem('userId', data.user?.id || '');
+        localStorage.setItem('userEmail', data.user?.email || '');
+        localStorage.setItem('userName', data.user?.name || '');
+        localStorage.setItem('userPhone', data.user?.phone || '');
+        localStorage.setItem('userBloodGroup', data.user?.blood_group || '');
+        localStorage.setItem('userLocation', data.user?.location || '');
+        localStorage.setItem('isLoggedIn', 'true');
+
+        window.location.href = {
+            donor: 'donor-dashboard.html',
+            admin: 'admin-dashboard.html',
+            hospital: 'hospital-dashboard.html',
+            lab: 'lab-dashboard.html'
+        }[data.role];
+
+    } else {
+        console.error("Backend error:", data);
+        showError(data.error || "Login failed");
+    }
+
+} catch (err) {
+    console.error("FULL ERROR:", err);
+
+    if (err.message.includes("Failed to fetch")) {
+        showError("Server is waking up... try again in 2 seconds");
+    } else {
+        showError(err.message || "Something went wrong");
+    }
+}
 }
 
 // Login submit
