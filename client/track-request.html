@@ -285,7 +285,7 @@
             const tableBody = document.getElementById('donorTableBody');
             try {
                 // Use relative URL so it always hits the same server serving this page
-                const response = await fetch('/api/match/find', {
+                const response = await fetch('https://bloodconnect-vdiz.onrender.com/api/match/find', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ bloodGroup: bgParam, lat: lat, lon: lon })
@@ -389,7 +389,7 @@
                 // Use the session's logged-in user info as the "recipient" (person who needs blood)
                 const loggedInUser = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}');
 
-                const response = await fetch('/api/match/notify', {
+                const response = await fetch('https://bloodconnect-vdiz.onrender.com/api/match/notify', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -439,7 +439,7 @@
                 let pollCount = 0;
                 const pollInterval = setInterval(async () => {
                     try {
-                        const statRes = await fetch(`/api/webhook/status?phone=${encodeURIComponent(phone)}`);
+                        const statRes = await fetch(`https://bloodconnect-vdiz.onrender.com/api/webhook/status?phone=${encodeURIComponent(phone)}`);
                         const statData = await statRes.json();
                         
                         if (statData.status === "YES") {
